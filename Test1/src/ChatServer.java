@@ -1,21 +1,25 @@
-
-
 import java.net.*;
 import java.util.HashMap;
 import java.io.*;
 
 public class ChatServer implements Runnable {
+
+	private int port = 8080;
 	private Socket socket = null;
 	private ServerSocket server = null;
 	private HashMap<String, Socket> connected = null;
-	
-	public ChatServer(int port) {
+
+	public ChatServer() {
+
 		connected = new HashMap<String, Socket>();
+
 		try {
+
 			server = new ServerSocket(port);
+
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Could not create ServerSocket");
+			e.printStackTrace(System.out);
 		}
 		while (true) {
 			try {
@@ -24,12 +28,15 @@ public class ChatServer implements Runnable {
 				System.out.println("Server started: " + server);
 				System.out.println("Waiting for a client ...");
 				socket = server.accept();
-				System.out.println("Client accepted: " + socket.getInetAddress().toString().substring(1));
-				connected.put(socket.getInetAddress().toString().substring(1), socket);
+				System.out.println("Client accepted: "
+						+ socket.getInetAddress().toString().substring(1));
+				connected.put(socket.getInetAddress().toString().substring(1),
+						socket);
 				Thread t = new Thread(this);
 				t.start();
 
 			} catch (IOException ioe) {
+				System.out.println("Could not accept a client");
 				System.out.println(ioe);
 			}
 		}
@@ -53,26 +60,15 @@ public class ChatServer implements Runnable {
 	public void close() throws IOException {
 		if (socket != null)
 			socket.close();
-		// if (streamIn != null) streamIn.close();
-	}
-
-	public static void main(String args[]) {
-		ChatServer server = null;
-		// if (args.length != 1)
-		// System.out.println("Usage: java ChatServer port");
-		// else
-		server = new ChatServer(8081);
 	}
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 		DataInputStream streamIn = null;
-		//DataOutputStream streamOut = null;
 		try {
 			streamIn = openIStream();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.out.println("Could not create Input Stream");
 			e.printStackTrace();
 		}
 
@@ -80,18 +76,25 @@ public class ChatServer implements Runnable {
 		while (!done) {
 			try {
 				String line = streamIn.readUTF();
-				System.out.println(line);
+				System.out.println("To addr = " + line);
+				done = line.equals(".bye");
 				Socket sock = connected.get(line);
-				DataOutputStream OP = new DataOutputStream(sock.getOutputStream());
+				DataOutputStream OP = new DataOutputStream(
+						sock.getOutputStream());
 				line = streamIn.readUTF();
 				System.out.println(line);
 				OP.writeUTF("Server : " + line);
-				done = line.equals(".bye");
 			} catch (IOException ioe) {
 				System.out.println("Error");
 				done = true;
 			}
 		}
 
+	}
+
+	public static void main(String args[]) {
+
+		new ChatServer();
+		
 	}
 }
