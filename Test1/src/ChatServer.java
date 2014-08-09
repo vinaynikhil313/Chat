@@ -27,7 +27,9 @@ public class ChatServer implements Runnable {
 						+ ", please wait  ...");
 				System.out.println("Server started: " + server);
 				System.out.println("Waiting for a client ...");
+				
 				socket = server.accept();
+				
 				System.out.println("Client accepted: "
 						+ socket.getInetAddress().toString().substring(1));
 				connected.put(socket.getInetAddress().toString().substring(1),
