@@ -5,8 +5,7 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class Messaging implements Runnable {
-
-	private int rdwr = -1;
+	
 	Socket s = null;
 	private DataOutputStream messageOut = null;
 	private DataInputStream messageIn = null;
@@ -14,8 +13,8 @@ public class Messaging implements Runnable {
 	private Scanner in;
 	public ClientGUI cl = null;
 
-	Messaging(int rdwr, Socket s, ClientGUI cl) {
-		this.rdwr = rdwr;
+	Messaging(Socket s, ClientGUI cl) {
+
 		this.s = s;
 		this.cl = cl;
 		t = new Thread(this);
@@ -33,35 +32,17 @@ public class Messaging implements Runnable {
 	public void run() {
 
 		while (true) {
-
-			if (rdwr == 0) {
-				in = new Scanner(System.in);
-				// String input = in.nextLine();
-				String input = cl.newMessage.getText();
-				System.out.println("Input = " + input);
-				try {
-					messageOut.writeUTF("172.30.103.79");
-					messageOut.flush();
-					messageOut.writeUTF(input);
-					messageOut.flush();
-				} catch (IOException e) {
-					System.out.println("Could not write to stream");
-					e.printStackTrace(System.out);
-					return;
+			try {
+				if (messageIn != null) {
+					System.out.println("IJKL");
+					String message = messageIn.readUTF();
+					cl.chat.setText(cl.chat.getText() + "\n" + message);
+					System.out.println("From Server " + message);
 				}
-			} else if (rdwr == 1) {
-				try {
-					if (messageIn != null) {
-						System.out.println("IJKL");
-						String message = messageIn.readUTF();
-						cl.chat.setText(cl.chat.getText() + "\n" + message);
-						System.out.println("From Server " + message);
-					}
-				} catch (IOException e) {
-					System.out.println("Could not read from stream");
-					e.printStackTrace(System.out);
-					return;
-				}
+			} catch (IOException e) {
+				System.out.println("Could not read from stream");
+				e.printStackTrace(System.out);
+				return;
 			}
 		}
 	}

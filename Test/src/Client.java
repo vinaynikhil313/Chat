@@ -9,13 +9,14 @@ public class Client {
 	private String serverAddress = "172.30.102.178";
 	private int serverPort = 8080;
 	ClientGUI ui = null;
-	
-	Client(ClientGUI ui) {
+	String toAddr = null;
+	Client(ClientGUI ui, String toAddr) {
 		this.ui= ui;
+		this.toAddr = toAddr;
 		while (!connect())
 			;
 		//new Messaging(0, socket, ui);
-		new Messaging(1, socket, ui);
+		new Messaging(socket, ui);
 	}
 
 	void send(String input){
@@ -25,7 +26,7 @@ public class Client {
 		System.out.println("Input = " + input);
 		try {
 			DataOutputStream messageOut = new DataOutputStream(socket.getOutputStream());
-			messageOut.writeUTF("172.30.103.79");
+			messageOut.writeUTF(toAddr);
 			messageOut.flush();
 			messageOut.writeUTF(input);
 			messageOut.flush();

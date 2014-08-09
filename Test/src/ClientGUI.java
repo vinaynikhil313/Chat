@@ -12,9 +12,11 @@ public class ClientGUI implements ActionListener {
 	public JTextField newMessage = null;
 	public JButton sendButton = null;
 	Client cl = null;
-
-	ClientGUI() {
-		cl = new Client(this);
+	static String toAddr;
+	ClientGUI(String toAddr) {
+		ClientGUI.toAddr = toAddr;
+		cl = new Client(this, toAddr);
+		createAndShowGUI();
 	}
 
 	private JPanel createContentPane() {
@@ -95,7 +97,7 @@ public class ClientGUI implements ActionListener {
 		JFrame frame = new JFrame("[=] Client [=]");
 
 		// Create and set up the content pane.
-		ClientGUI client = new ClientGUI();
+		ClientGUI client = new ClientGUI(toAddr);
 		frame.setContentPane(client.createContentPane());
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -104,7 +106,7 @@ public class ClientGUI implements ActionListener {
 		frame.setVisible(true);
 	}
 
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		// Schedule a job for the event-dispatching thread:
 		// creating and showing this application's GUI.
 		SwingUtilities.invokeLater(new Runnable() {
@@ -113,7 +115,7 @@ public class ClientGUI implements ActionListener {
 			}
 		});
 	}
-
+*/
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
