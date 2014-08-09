@@ -14,9 +14,21 @@ public class ClientGUI implements ActionListener {
 	Client cl = null;
 	static String toAddr;
 	ClientGUI(String toAddr) {
+		
 		ClientGUI.toAddr = toAddr;
-		cl = new Client(this, toAddr);
 		createAndShowGUI();
+		JFrame.setDefaultLookAndFeelDecorated(true);
+		JFrame frame = new JFrame("[=] Client [=]");
+
+		// Create and set up the content pane.
+		//ClientGUI client = new ClientGUI(toAddr);
+		frame.setContentPane(this.createContentPane());
+
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLocation(100, 100);
+		frame.setSize(400, 400);
+		frame.setVisible(true);
+		cl = new Client(this, toAddr);
 	}
 
 	private JPanel createContentPane() {
@@ -93,7 +105,7 @@ public class ClientGUI implements ActionListener {
 
 	private static void createAndShowGUI() {
 
-		JFrame.setDefaultLookAndFeelDecorated(true);
+		/*JFrame.setDefaultLookAndFeelDecorated(true);
 		JFrame frame = new JFrame("[=] Client [=]");
 
 		// Create and set up the content pane.
@@ -103,7 +115,7 @@ public class ClientGUI implements ActionListener {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocation(100, 100);
 		frame.setSize(400, 400);
-		frame.setVisible(true);
+		frame.setVisible(true);*/
 	}
 
 	/*public static void main(String[] args) {

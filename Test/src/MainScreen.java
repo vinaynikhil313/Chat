@@ -60,7 +60,7 @@ public class MainScreen implements MouseListener {
 
 		b = new JButton[5];
 		for (int i = 0; i < 5; i++) {
-			b[i] = new JButton("172.30.102.178");
+			b[i] = new JButton("172.30.103.79");
 			b[i].addMouseListener(this);
 			b[i].setBackground(C);
 			b[i].setForeground(Color.BLACK);
