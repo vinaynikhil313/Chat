@@ -6,7 +6,7 @@ import java.net.UnknownHostException;
 public class Client {
 
 	private Socket socket = null;
-	private String serverAddress = "172.30.102.178";
+	private String serverAddress = "172.30.103.79";
 	private int serverPort = 8080;
 	ClientGUI ui = null;
 	String toAddr = null;
