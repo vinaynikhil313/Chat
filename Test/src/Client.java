@@ -1,3 +1,4 @@
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -13,14 +14,28 @@ public class Client {
 		this.ui= ui;
 		while (!connect())
 			;
-		new Messaging(0, socket, ui);
+		//new Messaging(0, socket, ui);
 		new Messaging(1, socket, ui);
 	}
 
-	void chat(){
+	void send(String input){
 		
-		new Messaging(0, socket, ui);
-		new Messaging(1, socket, ui);
+		System.out.println("EFGH");
+		//String input = ui.newMessage.getText();
+		System.out.println("Input = " + input);
+		try {
+			DataOutputStream messageOut = new DataOutputStream(socket.getOutputStream());
+			messageOut.writeUTF("172.30.102.178");
+			messageOut.flush();
+			messageOut.writeUTF(input);
+			messageOut.flush();
+		} catch (IOException e) {
+			System.out.println("Could not write to stream");
+			e.printStackTrace(System.out);
+			return;
+		}
+		//new Messaging(0, socket, ui);
+		//new Messaging(1, socket, ui);
 		
 	}
 	

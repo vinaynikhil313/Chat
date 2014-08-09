@@ -12,11 +12,12 @@ public class Messaging implements Runnable {
 	private DataInputStream messageIn = null;
 	Thread t = null;
 	private Scanner in;
-	ClientGUI cl = null;
+	public ClientGUI cl = null;
 
 	Messaging(int rdwr, Socket s, ClientGUI cl) {
 		this.rdwr = rdwr;
 		this.s = s;
+		this.cl = cl;
 		t = new Thread(this);
 		t.start();
 		try {
@@ -35,7 +36,9 @@ public class Messaging implements Runnable {
 
 			if (rdwr == 0) {
 				in = new Scanner(System.in);
-				String input = in.nextLine();
+				// String input = in.nextLine();
+				String input = cl.newMessage.getText();
+				System.out.println("Input = " + input);
 				try {
 					messageOut.writeUTF("172.30.102.178");
 					messageOut.flush();
@@ -48,7 +51,12 @@ public class Messaging implements Runnable {
 				}
 			} else if (rdwr == 1) {
 				try {
-					System.out.println("From Server " + messageIn.readUTF());
+					if (messageIn != null) {
+						System.out.println("IJKL");
+						String message = messageIn.readUTF();
+						cl.chat.setText(cl.chat.getText() + "\n" + message);
+						System.out.println("From Server " + message);
+					}
 				} catch (IOException e) {
 					System.out.println("Could not read from stream");
 					e.printStackTrace(System.out);
