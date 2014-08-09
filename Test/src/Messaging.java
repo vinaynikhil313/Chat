@@ -40,7 +40,7 @@ public class Messaging implements Runnable {
 				String input = cl.newMessage.getText();
 				System.out.println("Input = " + input);
 				try {
-					messageOut.writeUTF("172.30.102.178");
+					messageOut.writeUTF("172.30.103.79");
 					messageOut.flush();
 					messageOut.writeUTF(input);
 					messageOut.flush();

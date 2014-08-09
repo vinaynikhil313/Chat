@@ -25,7 +25,7 @@ public class Client {
 		System.out.println("Input = " + input);
 		try {
 			DataOutputStream messageOut = new DataOutputStream(socket.getOutputStream());
-			messageOut.writeUTF("172.30.102.178");
+			messageOut.writeUTF("172.30.103.79");
 			messageOut.flush();
 			messageOut.writeUTF(input);
 			messageOut.flush();
@@ -60,7 +60,7 @@ public class Client {
 
 	public static void main(String[] args) {
 
-		new Client(null);
+		//new Client(null);
 	}
 
 }

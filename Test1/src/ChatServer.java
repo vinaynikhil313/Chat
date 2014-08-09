@@ -65,6 +65,7 @@ public class ChatServer implements Runnable {
 	@Override
 	public void run() {
 		DataInputStream streamIn = null;
+		Socket temp = socket;
 		try {
 			streamIn = openIStream();
 		} catch (IOException e) {
@@ -77,13 +78,13 @@ public class ChatServer implements Runnable {
 			try {
 				String line = streamIn.readUTF();
 				System.out.println("To addr = " + line);
-				done = line.equals(".bye");
 				Socket sock = connected.get(line);
 				DataOutputStream OP = new DataOutputStream(
 						sock.getOutputStream());
 				line = streamIn.readUTF();
+				done = line.equals(".bye");
 				System.out.println(line);
-				OP.writeUTF("Server : " + line);
+				OP.writeUTF(temp.getInetAddress().toString().substring(1) + " : " + line);
 			} catch (IOException ioe) {
 				System.out.println("Error");
 				done = true;
