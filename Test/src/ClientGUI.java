@@ -30,7 +30,11 @@ public class ClientGUI implements ActionListener{
 		//ClientGUI client = new ClientGUI(toAddr);
 		frame.setContentPane(this.createContentPane());
 
+<<<<<<< HEAD
 		//frame.setDefaultCloseOperation(JFrame.ABORT);
+=======
+		//frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+>>>>>>> origin/master
 		frame.setLocation(100, 100);
 		frame.setSize(400, 400);
 		frame.setVisible(true);
