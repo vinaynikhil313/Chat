@@ -1,14 +1,14 @@
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Scanner;
 
 public class Messaging implements Runnable {
 	
 	Socket s = null;
-	private DataOutputStream messageOut = null;
-	private DataInputStream messageIn = null;
+	private ObjectOutputStream messageOut = null;
+	private ObjectInputStream messageIn = null;
 	Thread t = null;
 	private Scanner in;
 	public ClientGUI cl = null;
@@ -17,32 +17,42 @@ public class Messaging implements Runnable {
 
 		this.s = s;
 		this.cl = cl;
+		System.out.println("IL");
 		t = new Thread(this);
+		System.out.println(s.getInetAddress() + " and " + s.isConnected() + " and " + s.isClosed());
 		t.start();
-		try {
-			messageOut = new DataOutputStream(s.getOutputStream());
-			messageIn = new DataInputStream(s.getInputStream());
-		} catch (IOException e) {
-			System.out.println("Could not create streams");
-			e.printStackTrace(System.out);
-		}
+		
 	}
 
 	@Override
 	public void run() {
 
+		try {
+			
+			System.out.println("IL1");
+			messageIn = new ObjectInputStream(s.getInputStream());
+			System.out.println("IL2");
+		} catch (IOException e) {
+			System.out.println("Could not create streams");
+			e.printStackTrace(System.out);
+		}
+		
 		while (true) {
 			try {
 				if (messageIn != null) {
 					System.out.println("IJKL");
-					String message = messageIn.readUTF();
-					cl.chat.setText(cl.chat.getText() + "\n" + message);
-					System.out.println("From Server " + message);
+					//String message = messageIn.readUTF();
+					MessagePacket m = (MessagePacket) messageIn.readObject();
+					cl.chat.setText(cl.chat.getText() + "\n" + m.getAddr() + " : " + m.getMessage());
+					System.out.println("From Server " + m.getAddr() + " : " + m.getMessage());
 				}
 			} catch (IOException e) {
 				System.out.println("Could not read from stream");
 				e.printStackTrace(System.out);
 				return;
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}

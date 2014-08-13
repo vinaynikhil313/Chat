@@ -45,17 +45,15 @@ public class ChatServer implements Runnable {
 
 	}
 
-	public DataInputStream openIStream() throws IOException {
-		DataInputStream streamIn;
-		streamIn = new DataInputStream(new BufferedInputStream(
-				socket.getInputStream()));
+	public ObjectInputStream openIStream() throws IOException {
+		ObjectInputStream streamIn;
+		streamIn = new ObjectInputStream(socket.getInputStream());
 		return streamIn;
 	}
 
-	public DataOutputStream openOStream() throws IOException {
-		DataOutputStream streamOut;
-		streamOut = new DataOutputStream(new BufferedOutputStream(
-				socket.getOutputStream()));
+	public ObjectOutputStream openOStream() throws IOException {
+		ObjectOutputStream streamOut;
+		streamOut = new ObjectOutputStream(socket.getOutputStream());
 		return streamOut;
 	}
 
@@ -66,7 +64,7 @@ public class ChatServer implements Runnable {
 
 	@Override
 	public void run() {
-		DataInputStream streamIn = null;
+		ObjectInputStream streamIn = null;
 		Socket temp = socket;
 		try {
 			streamIn = openIStream();
@@ -78,18 +76,25 @@ public class ChatServer implements Runnable {
 		boolean done = false;
 		while (!done) {
 			try {
-				String line = streamIn.readUTF();
-				System.out.println("To addr = " + line);
-				Socket sock = connected.get(line);
-				DataOutputStream OP = new DataOutputStream(
-						sock.getOutputStream());
-				line = streamIn.readUTF();
-				done = line.equals(".bye");
-				System.out.println(line);
-				OP.writeUTF(temp.getInetAddress().toString().substring(1) + " : " + line);
+				MessagePacket m = (MessagePacket) streamIn.readObject();
+				//String line = streamIn.readUTF();
+				//System.out.println(socket.getInetAddress() + " and " + socket.isConnected() + " and " + socket.isClosed());
+				System.out.println("To addr = " + m.getAddr());
+				Socket sock = connected.get(m.getAddr());
+				ObjectOutputStream OP = new ObjectOutputStream(sock.getOutputStream());
+				System.out.println(sock.getInetAddress() + " and " + sock.isConnected() + " and " + sock.isClosed());
+				//line = streamIn.readUTF();
+				done = m.getMessage().equals(".bye");
+				System.out.println("Message : " + m.getMessage());
+				m.setAddr(temp.getInetAddress().toString().substring(1));
+				OP.writeObject(m);
+				//OP.writeUTF(temp.getInetAddress().toString().substring(1) + " : " + line);
 			} catch (IOException ioe) {
 				System.out.println("Error");
 				done = true;
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 

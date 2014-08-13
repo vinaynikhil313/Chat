@@ -1,20 +1,28 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.net.Socket;
+
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 
-public class ClientGUI implements ActionListener {
+public class ClientGUI implements ActionListener{
 
 	public JTextArea chat = null;
 	public JTextField newMessage = null;
 	public JButton sendButton = null;
 	Client cl = null;
 	static String toAddr;
-	ClientGUI(String toAddr) {
+	Socket socket = null;
+	ClientGUI(String toAddr, Socket socket) {
 		
-		ClientGUI.toAddr = toAddr;
-		createAndShowGUI();
+		this.toAddr = toAddr;
+		this.socket = socket;
+		System.out.println(socket.getInetAddress() + " and " + socket.isConnected() + " and " + socket.isClosed());
+		//createAndShowGUI();
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		JFrame frame = new JFrame("[=] Client [=]");
 
@@ -22,11 +30,12 @@ public class ClientGUI implements ActionListener {
 		//ClientGUI client = new ClientGUI(toAddr);
 		frame.setContentPane(this.createContentPane());
 
-		frame.setDefaultCloseOperation(JFrame.ABORT);
+		//frame.setDefaultCloseOperation(JFrame.ABORT);
 		frame.setLocation(100, 100);
 		frame.setSize(400, 400);
 		frame.setVisible(true);
-		cl = new Client(this, toAddr);
+		//cl = new Client(this, toAddr, socket);
+		new Messaging(socket, this);
 	}
 
 	private JPanel createContentPane() {
@@ -101,9 +110,9 @@ public class ClientGUI implements ActionListener {
 
 	}
 
-	private static void createAndShowGUI() {
+	/*private static void createAndShowGUI() {
 
-		/*JFrame.setDefaultLookAndFeelDecorated(true);
+		JFrame.setDefaultLookAndFeelDecorated(true);
 		JFrame frame = new JFrame("[=] Client [=]");
 
 		// Create and set up the content pane.
@@ -113,8 +122,8 @@ public class ClientGUI implements ActionListener {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocation(100, 100);
 		frame.setSize(400, 400);
-		frame.setVisible(true);*/
-	}
+		frame.setVisible(true);
+	}*/
 
 	/*public static void main(String[] args) {
 		// Schedule a job for the event-dispatching thread:
@@ -126,12 +135,40 @@ public class ClientGUI implements ActionListener {
 		});
 	}
 */
+	
+	
+	void send(String input){
+		
+		System.out.println("EFGH");
+		//String input = ui.newMessage.getText();
+		System.out.println("Input = " + input);
+		MessagePacket m = new MessagePacket();
+		m.setMessage(input);
+		m.setAddr(toAddr);
+		try {
+			System.out.println(socket.toString());
+			ObjectOutputStream messageOut = new ObjectOutputStream(socket.getOutputStream());
+			messageOut.flush();
+			messageOut.writeObject(m);
+			//messageOut.flush();
+			//messageOut.writeUTF(input.toString());
+			//messageOut.flush();
+		} catch (IOException e) {
+			System.out.println("Could not write to stream");
+			e.printStackTrace(System.out);
+			return;
+		}
+		//new Messaging(0, socket, ui);
+		//new Messaging(1, socket, ui);
+		
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
 		if (e.getSource() == sendButton) {
 			String message = newMessage.getText();
-			cl.send(message);
+			send(message);
 			newMessage.setText("");
 			chat.setText(chat.getText() + "\nME : " + message);
 		}

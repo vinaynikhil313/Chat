@@ -2,9 +2,12 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -16,14 +19,17 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 
-public class MainScreen implements MouseListener {
+public class MainScreen{
 
 	public JTextArea chat = null;
 	public JTextField newMessage = null;
 	public static JButton b[] = null;
 	public JButton sendButton2 = null;
+	private static Socket socket = null;
+	private static String serverAddress = "172.30.102.178";
+	private static int serverPort = 8080;
 	Color C = new Color(59, 89, 182);
-
+	static int isOpen[] = null;
 	private JPanel createContentPane() {
 
 		// JPanel to place everything on.
@@ -59,16 +65,19 @@ public class MainScreen implements MouseListener {
 		friends.add(titleLabel2);
 
 		b = new JButton[5];
+		isOpen = new int[5];
 		for (int i = 0; i < 5; i++) {
-			b[i] = new JButton("172.30.103.79");
-			b[i].addMouseListener(this);
+			b[i] = new JButton("172.30.102.178");
+			b[i].addMouseListener(new Buttons(i));
 			b[i].setBackground(C);
 			b[i].setForeground(Color.BLACK);
 			b[i].setSize(150, 30);
 			b[i].setLocation(10, 40+30*i);
 			b[i].setFocusPainted(false);
 			b[i].setFont(new Font("Tahoma", Font.BOLD, 12));
-
+			
+			isOpen[i]=0;
+			
 			friends.add(b[i]);
 		}
 		JPanel bottomPanel = new JPanel();
@@ -102,9 +111,31 @@ public class MainScreen implements MouseListener {
 		frame.setLocation(100, 100);
 		frame.setSize(400, 600);
 		frame.setVisible(true);
+		
 	}
 
+	private static boolean connect() {
+
+		System.out.println("Establishing connection. Please wait ...");
+
+		try {
+
+			socket = new Socket(serverAddress, serverPort);
+			System.out.println("Connected: " + socket);
+
+		} catch (UnknownHostException uhe) {
+			System.out.println("Host unknown: " + uhe.getMessage());
+			return false;
+		} catch (IOException ioe) {
+			System.out.println("Could not load data stream....Retry");
+			return false;
+		}
+		return true;
+	}
 	public static void main(String[] args) {
+		
+		while (!connect())
+			;
 		// Schedule a job for the event-dispatching thread:
 		// creating and showing this application's GUI.
 		SwingUtilities.invokeLater(new Runnable() {
@@ -113,14 +144,52 @@ public class MainScreen implements MouseListener {
 			}
 		});
 	}
+	
+	class Buttons extends MouseAdapter {
+	    private final int index;
 
-	@Override
+	    public Buttons(int index) {
+	        this.index = index;
+	    }
+
+	    @Override
+		public void mouseClicked(MouseEvent arg0) {
+			
+	    	b[index].setForeground(Color.BLACK);
+			String toAddr = b[index].getText();
+			if(isOpen[index]==0)
+			{
+				new ClientGUI(toAddr, socket);
+				isOpen[index]=1;
+			}
+	    	
+		}
+
+	    @Override
+		public void mouseEntered(MouseEvent e) {
+			// TODO Auto-generated method stub
+			b[index].setBackground(Color.WHITE);
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			// TODO Auto-generated method stub
+			b[index].setBackground(C);
+		}
+
+	}
+
+	/*@Override
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
 		JButton temp = (JButton) e.getSource();
 		temp.setForeground(Color.BLACK);
 		String toAddr = temp.getText();
-		new ClientGUI(toAddr);
+		if(isOpen[0]==0)
+		{
+			new ClientGUI(toAddr, socket);
+			isOpen[0]=1;
+		}
 	}
 
 	@Override
@@ -147,5 +216,5 @@ public class MainScreen implements MouseListener {
 	public void mouseReleased(MouseEvent e) {
 		// TODO Auto-generated method stub
 
-	}
+	}*/
 }
