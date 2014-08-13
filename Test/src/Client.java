@@ -16,7 +16,7 @@ public class Client {
 		
 		//new Messaging(0, socket, ui);
 		this.socket = socket;
-		new Messaging(socket, ui);
+		//new Messaging(ui);
 	}
 	
 	

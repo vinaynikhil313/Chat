@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
@@ -17,11 +18,18 @@ public class ClientGUI implements ActionListener{
 	Client cl = null;
 	static String toAddr;
 	Socket socket = null;
+	ObjectOutputStream messageOut = null;
 	ClientGUI(String toAddr, Socket socket) {
 		
 		this.toAddr = toAddr;
 		this.socket = socket;
 		System.out.println(socket.getInetAddress() + " and " + socket.isConnected() + " and " + socket.isClosed());
+		try {
+			messageOut = new ObjectOutputStream(socket.getOutputStream());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		//createAndShowGUI();
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		JFrame frame = new JFrame("[=] Client [=]");
@@ -30,16 +38,18 @@ public class ClientGUI implements ActionListener{
 		//ClientGUI client = new ClientGUI(toAddr);
 		frame.setContentPane(this.createContentPane());
 
-<<<<<<< HEAD
 		//frame.setDefaultCloseOperation(JFrame.ABORT);
-=======
 		//frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
->>>>>>> origin/master
 		frame.setLocation(100, 100);
 		frame.setSize(400, 400);
 		frame.setVisible(true);
 		//cl = new Client(this, toAddr, socket);
-		new Messaging(socket, this);
+		try {
+			new Messaging(this, socket.getInputStream());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private JPanel createContentPane() {
@@ -151,10 +161,11 @@ public class ClientGUI implements ActionListener{
 		m.setAddr(toAddr);
 		try {
 			System.out.println(socket.toString());
-			ObjectOutputStream messageOut = new ObjectOutputStream(socket.getOutputStream());
-			messageOut.flush();
-			messageOut.writeObject(m);
+			//ObjectOutputStream messageOut = new ObjectOutputStream(socket.getOutputStream());
+			System.out.println(messageOut);
 			//messageOut.flush();
+			messageOut.writeObject(m);
+			messageOut.flush();
 			//messageOut.writeUTF(input.toString());
 			//messageOut.flush();
 		} catch (IOException e) {
