@@ -88,6 +88,7 @@ public class ChatServer implements Runnable {
 				System.out.println("Message : " + m.getMessage());
 				m.setAddr(temp.getInetAddress().toString().substring(1));
 				OP.writeObject(m);
+				OP.reset();
 				//OP.writeUTF(temp.getInetAddress().toString().substring(1) + " : " + line);
 			} catch (IOException ioe) {
 				System.out.println("Error");

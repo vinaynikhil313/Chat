@@ -163,7 +163,7 @@ public class ClientGUI implements ActionListener{
 			System.out.println(socket.toString());
 			//ObjectOutputStream messageOut = new ObjectOutputStream(socket.getOutputStream());
 			System.out.println(messageOut);
-			//messageOut.flush();
+			messageOut.reset();
 			messageOut.writeObject(m);
 			messageOut.flush();
 			//messageOut.writeUTF(input.toString());
