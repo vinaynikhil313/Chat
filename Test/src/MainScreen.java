@@ -6,6 +6,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import javax.swing.BorderFactory;
@@ -30,6 +32,8 @@ public class MainScreen{
 	private static int serverPort = 8080;
 	Color C = new Color(59, 89, 182);
 	static int isOpen[] = null;
+	static ObjectOutputStream outStream;
+	static ObjectInputStream inStream;
 	private JPanel createContentPane() {
 
 		// JPanel to place everything on.
@@ -122,7 +126,8 @@ public class MainScreen{
 
 			socket = new Socket(serverAddress, serverPort);
 			System.out.println("Connected: " + socket);
-
+			outStream = new ObjectOutputStream(socket.getOutputStream());
+			inStream = new ObjectInputStream(socket.getInputStream());
 		} catch (UnknownHostException uhe) {
 			System.out.println("Host unknown: " + uhe.getMessage());
 			return false;
@@ -159,7 +164,7 @@ public class MainScreen{
 			String toAddr = b[index].getText();
 			if(isOpen[index]==0)
 			{
-				new ClientGUI(toAddr, socket);
+				new ClientGUI(toAddr, outStream, inStream);
 				isOpen[index]=1;
 			}
 	    	
@@ -178,43 +183,5 @@ public class MainScreen{
 		}
 
 	}
-
-	/*@Override
-	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
-		JButton temp = (JButton) e.getSource();
-		temp.setForeground(Color.BLACK);
-		String toAddr = temp.getText();
-		if(isOpen[0]==0)
-		{
-			new ClientGUI(toAddr, socket);
-			isOpen[0]=1;
-		}
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-		JButton temp = (JButton) e.getSource();
-		temp.setBackground(Color.WHITE);
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-		JButton temp = (JButton) e.getSource();
-		temp.setBackground(C);
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}*/
+	
 }

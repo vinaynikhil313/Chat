@@ -7,16 +7,16 @@ import java.util.Scanner;
 
 public class Messaging implements Runnable {
 	
-	//Socket s = null;
-	private ObjectOutputStream messageOut = null;
+	
 	private ObjectInputStream messageIn = null;
 	Thread t = null;
 	public ClientGUI cl = null;
 
-	Messaging(ClientGUI cl, InputStream in) {
+	Messaging(ClientGUI cl, ObjectInputStream in) {
 
 		//this.s = s;
 		this.cl = cl;
+		this.messageIn = in;
 		System.out.println("IL");
 		//createStream();
 		t = new Thread(this);
@@ -27,7 +27,7 @@ public class Messaging implements Runnable {
 	
 	
 
-	private void createStream() {
+	/*private void createStream() {
 		// TODO Auto-generated method stub
 		try {
 			this.messageIn = new ObjectInputStream(cl.socket.getInputStream());
@@ -35,7 +35,7 @@ public class Messaging implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
+	}*/
 
 
 
@@ -55,7 +55,7 @@ public class Messaging implements Runnable {
 		if(messageIn == null)
 		{
 			System.out.println("NULL");
-			createStream();
+			//createStream();
 		}
 		while (true) {
 			try {

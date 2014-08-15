@@ -7,11 +7,11 @@ public class ChatServer implements Runnable {
 	private int port = 8080;
 	private Socket socket = null;
 	private ServerSocket server = null;
-	private HashMap<String, Socket> connected = null;
+	private HashMap<String, ObjectOutputStream> connected = null;
 
 	public ChatServer() {
 
-		connected = new HashMap<String, Socket>();
+		connected = new HashMap<String, ObjectOutputStream>();
 
 		try {
 
@@ -33,7 +33,7 @@ public class ChatServer implements Runnable {
 				System.out.println("Client accepted: "
 						+ socket.getInetAddress().toString().substring(1));
 				connected.put(socket.getInetAddress().toString().substring(1),
-						socket);
+						new ObjectOutputStream(socket.getOutputStream()));
 				Thread t = new Thread(this);
 				t.start();
 
@@ -81,15 +81,15 @@ public class ChatServer implements Runnable {
 				//String line = streamIn.readUTF();
 				//System.out.println(socket.getInetAddress() + " and " + socket.isConnected() + " and " + socket.isClosed());
 				System.out.println("To addr = " + m.getAddr());
-				Socket sock = connected.get(m.getAddr());
-				ObjectOutputStream OP = new ObjectOutputStream(sock.getOutputStream());
-				System.out.println(sock.getInetAddress() + " and " + sock.isConnected() + " and " + sock.isClosed());
+				ObjectOutputStream OP = connected.get(m.getAddr());
+				//ObjectOutputStream OP = new ObjectOutputStream(sock.getOutputStream());
+				//System.out.println(sock.getInetAddress() + " and " + sock.isConnected() + " and " + sock.isClosed());
 				//line = streamIn.readUTF();
 				done = m.getMessage().equals(".bye");
 				System.out.println("Message : " + m.getMessage());
 				m.setAddr(temp.getInetAddress().toString().substring(1));
 				OP.writeObject(m);
-				OP.reset();
+				//OP.reset();
 				//OP.writeUTF(temp.getInetAddress().toString().substring(1) + " : " + line);
 			} catch (IOException ioe) {
 				System.out.println("Error");

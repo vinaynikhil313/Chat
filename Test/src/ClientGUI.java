@@ -17,22 +17,15 @@ public class ClientGUI implements ActionListener{
 	public JTextField newMessage = null;
 	public JButton sendButton = null;
 	Client cl = null;
-	static String toAddr;
-	Socket socket = null;
+	String toAddr;
 	ObjectOutputStream messageOut = null;
+	ObjectInputStream  messageIn = null;
 	//DataOutputStream messageOut = null;
-	ClientGUI(String toAddr, Socket socket) {
+	ClientGUI(String toAddr,ObjectOutputStream messageOut, ObjectInputStream  messageIn) {
 		
 		this.toAddr = toAddr;
-		this.socket = socket;
-		System.out.println(socket.getInetAddress() + " and " + socket.isConnected() + " and " + socket.isClosed());
-		try {
-			messageOut = new ObjectOutputStream(socket.getOutputStream());
-			//messageOut = new DataOutputStream(socket.getOutputStream());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		this.messageOut = messageOut;
+		this.messageIn = messageIn;
 		//createAndShowGUI();
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		JFrame frame = new JFrame("[=] Client [=]");
@@ -46,13 +39,7 @@ public class ClientGUI implements ActionListener{
 		frame.setLocation(100, 100);
 		frame.setSize(400, 400);
 		frame.setVisible(true);
-		//cl = new Client(this, toAddr, socket);
-		try {
-			new Messaging(this, socket.getInputStream());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		new Messaging(this, messageIn);
 	}
 
 	private JPanel createContentPane() {
@@ -163,14 +150,14 @@ public class ClientGUI implements ActionListener{
 		m.setMessage(input);
 		m.setAddr(toAddr);
 		try {
-			System.out.println(socket.toString());
+			//System.out.println(socket.toString());
 			//ObjectOutputStream messageOut = new ObjectOutputStream(socket.getOutputStream());
 			System.out.println(messageOut);
 			//messageOut.flush();
 			//messageOut.writeUTF(toAddr);
 			
 			messageOut.writeObject(m);
-			messageOut.reset();
+			//messageOut.reset();
 			//messageOut.flush();
 			//messageOut.writeUTF(input.toString());
 			//messageOut.flush();
