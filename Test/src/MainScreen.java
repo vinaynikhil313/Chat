@@ -26,7 +26,7 @@ public class MainScreen{
 	public static JButton b[] = null;
 	public JButton sendButton2 = null;
 	private static Socket socket = null;
-	private static String serverAddress = "172.30.102.178";
+	private static String serverAddress = "172.30.103.79";
 	private static int serverPort = 8080;
 	Color C = new Color(59, 89, 182);
 	static int isOpen[] = null;
