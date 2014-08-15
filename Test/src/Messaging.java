@@ -63,6 +63,7 @@ public class Messaging implements Runnable {
 					System.out.println("IJKL");
 					//String message = messageIn.readUTF();
 					MessagePacket m = (MessagePacket) messageIn.readObject();
+					messageIn.reset();
 					cl.chat.setText(cl.chat.getText() + "\n" + m.getAddr() + " : " + m.getMessage());
 					System.out.println("From Server " + m.getAddr() + " : " + m.getMessage());
 				//}

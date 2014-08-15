@@ -77,6 +77,7 @@ public class ChatServer implements Runnable {
 		while (!done) {
 			try {
 				MessagePacket m = (MessagePacket) streamIn.readObject();
+				streamIn.reset();
 				//String line = streamIn.readUTF();
 				//System.out.println(socket.getInetAddress() + " and " + socket.isConnected() + " and " + socket.isClosed());
 				System.out.println("To addr = " + m.getAddr());
@@ -88,6 +89,7 @@ public class ChatServer implements Runnable {
 				System.out.println("Message : " + m.getMessage());
 				m.setAddr(temp.getInetAddress().toString().substring(1));
 				OP.writeObject(m);
+				OP.reset();
 				//OP.writeUTF(temp.getInetAddress().toString().substring(1) + " : " + line);
 			} catch (IOException ioe) {
 				System.out.println("Error");

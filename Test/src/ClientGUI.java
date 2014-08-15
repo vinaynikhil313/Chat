@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -19,6 +20,7 @@ public class ClientGUI implements ActionListener{
 	static String toAddr;
 	Socket socket = null;
 	ObjectOutputStream messageOut = null;
+	//DataOutputStream messageOut = null;
 	ClientGUI(String toAddr, Socket socket) {
 		
 		this.toAddr = toAddr;
@@ -26,6 +28,7 @@ public class ClientGUI implements ActionListener{
 		System.out.println(socket.getInetAddress() + " and " + socket.isConnected() + " and " + socket.isClosed());
 		try {
 			messageOut = new ObjectOutputStream(socket.getOutputStream());
+			//messageOut = new DataOutputStream(socket.getOutputStream());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -164,8 +167,11 @@ public class ClientGUI implements ActionListener{
 			//ObjectOutputStream messageOut = new ObjectOutputStream(socket.getOutputStream());
 			System.out.println(messageOut);
 			//messageOut.flush();
+			//messageOut.writeUTF(toAddr);
+			
 			messageOut.writeObject(m);
-			messageOut.flush();
+			messageOut.reset();
+			//messageOut.flush();
 			//messageOut.writeUTF(input.toString());
 			//messageOut.flush();
 		} catch (IOException e) {
