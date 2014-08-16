@@ -3,6 +3,10 @@ import java.io.Serializable;
 
 public class MessagePacket implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	String addr, message;
 
 	public String getAddr() {
