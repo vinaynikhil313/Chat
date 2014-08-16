@@ -3,9 +3,6 @@ import java.io.Serializable;
 
 public class MessagePacket implements Serializable{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	String toAddr, fromAddr, message;
 	
@@ -28,5 +25,4 @@ public class MessagePacket implements Serializable{
 		this.message = message;
 	}
 
-	
 }

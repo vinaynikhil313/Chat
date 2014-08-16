@@ -83,6 +83,7 @@ public class MainScreen{
 			
 			friends.add(b[i]);
 		}
+		b[0].setText("172.30.103.79");
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.setLayout(null);
 		bottomPanel.setLocation(10, 470);
@@ -206,7 +207,6 @@ public class Receiving implements Runnable {
 			while (true) {
 				try {
 						MessagePacket m = (MessagePacket) inStream.readObject();
-						//messageIn.reset();
 						ClientGUI temp = openedWindows.get(m.getFromAddr());
 						if(temp != null)
 						{

@@ -18,9 +18,7 @@ public class ClientGUI implements ActionListener{
 	String toAddr;
 	ObjectOutputStream messageOut = null;
 	ObjectInputStream  messageIn = null;
-	//Receiving r = null;
-	//DataOutputStream messageOut = null;
-	ClientGUI(final String toAddr,ObjectOutputStream messageOut) {
+	ClientGUI(final String toAddr, ObjectOutputStream messageOut) {
 		
 		this.toAddr = toAddr;
 		this.messageOut = messageOut;
@@ -38,6 +36,15 @@ public class ClientGUI implements ActionListener{
 		        MainScreen.openedWindows.remove(toAddr);
 		    }
 		});
+		frame.getRootPane().setDefaultButton(sendButton);
+		/*
+		 * 
+		 * For each frame, you can set a default button that will automatically listen
+		 *  to the Enter key (and maybe some other event's I'm not aware of).
+		 *  When you hit enter in that frame, the ActionListeners their 
+		 *  actionPerformed() method will be invoked.
+		 * 
+		 */
 	}
 
 	private JPanel createContentPane() {
@@ -74,13 +81,9 @@ public class ClientGUI implements ActionListener{
 		chat.setLineWrap(true);
 		chat.setOpaque(false);
 		chat.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-		// chat.setCaretPosition(0);
-		// chat.setMargin(new Insets(50, 50, 300, 150));
 		chat.setEditable(false);
 		chat.setVisible(true);
-		// chat.setHorizontalAlignment(0);
 		chatPanel.add(new JScrollPane(chat));
-		//chatPanel.add(chat);
 
 		
 		JPanel bottomPanel = new JPanel();
@@ -90,16 +93,13 @@ public class ClientGUI implements ActionListener{
 		totalGUI.add(bottomPanel, BorderLayout.SOUTH);
 
 		newMessage = new JTextField("", SwingConstants.WEST);
-		//newMessage.setLocation(0, 0);
-		//newMessage.setAlignmentX(0);
-		newMessage.setSize(800, 70);
-		bottomPanel.add(newMessage, BorderLayout.WEST);
+		bottomPanel.add(newMessage);
 
 		sendButton = new JButton("Send");
 		sendButton.setLocation(270, 0);
-		sendButton.setSize(100, 30);
+		sendButton.setSize(30, 30);
 		sendButton.addActionListener(this);
-		bottomPanel.add(sendButton);
+		bottomPanel.add(sendButton, BorderLayout.EAST);
 
 		totalGUI.setOpaque(true);
 		return totalGUI;
@@ -109,7 +109,6 @@ public class ClientGUI implements ActionListener{
 	void send(String input){
 		
 		System.out.println("EFGH");
-		//String input = ui.newMessage.getText();
 		System.out.println("Input = " + input);
 		MessagePacket m = new MessagePacket();
 		m.setMessage(input);
@@ -137,5 +136,5 @@ public class ClientGUI implements ActionListener{
 		}
 
 	}
-	
+
 }

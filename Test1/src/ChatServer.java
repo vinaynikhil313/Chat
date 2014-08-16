@@ -85,6 +85,7 @@ public class ChatServer implements Runnable {
 		}
 		//System.out.println(connected.get(temp.getInetAddress().toString().substring(1)));
 		connected.remove(temp.getInetAddress().toString().substring(1));
+		
 		try {
 			temp.close();
 		} catch (IOException e) {
