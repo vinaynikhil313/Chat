@@ -98,9 +98,9 @@ public class MainScreen{
 
 	private static void createAndShowGUI() {
 
-		JFrame.setDefaultLookAndFeelDecorated(true);
+		
 		JFrame frame = new JFrame("[=] Client [=]");
-
+		JFrame.setDefaultLookAndFeelDecorated(true);
 		// Create and set up the content pane.
 		MainScreen mainScreen = new MainScreen();
 		frame.setContentPane(mainScreen.createContentPane());

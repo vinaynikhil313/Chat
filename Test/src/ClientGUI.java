@@ -24,7 +24,6 @@ public class ClientGUI implements ActionListener{
 		this.toAddr = toAddr;
 		this.messageOut = messageOut;
 		this.messageIn = messageIn;
-		//createAndShowGUI();
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		JFrame frame = new JFrame("[=] Client [=]");
 
@@ -32,8 +31,6 @@ public class ClientGUI implements ActionListener{
 		//ClientGUI client = new ClientGUI(toAddr);
 		frame.setContentPane(this.createContentPane());
 
-		//frame.setDefaultCloseOperation(JFrame.ABORT);
-		//frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocation(100, 100);
 		frame.setSize(400, 400);
 		frame.setVisible(true);
@@ -98,14 +95,14 @@ public class ClientGUI implements ActionListener{
 		newMessage = new JTextField("", SwingConstants.WEST);
 		//newMessage.setLocation(0, 0);
 		//newMessage.setAlignmentX(0);
-		newMessage.setSize(400, 30);
+		newMessage.setSize(800, 70);
 		bottomPanel.add(newMessage, BorderLayout.WEST);
 
 		sendButton = new JButton("Send");
 		sendButton.setLocation(270, 0);
 		sendButton.setSize(100, 30);
 		sendButton.addActionListener(this);
-		//bottomPanel.add(sendButton);
+		bottomPanel.add(sendButton);
 
 		totalGUI.setOpaque(true);
 		return totalGUI;

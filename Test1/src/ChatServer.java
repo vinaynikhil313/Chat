@@ -21,19 +21,23 @@ public class ChatServer implements Runnable {
 			System.out.println("Could not create ServerSocket");
 			e.printStackTrace(System.out);
 		}
+		
+		System.out.println("Binding to port " + port + ", please wait  ...");
+		System.out.println("Server started: " + server);
+		
 		while (true) {
 			try {
-				System.out.println("Binding to port " + port
-						+ ", please wait  ...");
-				System.out.println("Server started: " + server);
+				
 				System.out.println("Waiting for a client ...");
 				
 				socket = server.accept();
 				
 				System.out.println("Client accepted: "
 						+ socket.getInetAddress().toString().substring(1));
+				
 				connected.put(socket.getInetAddress().toString().substring(1),
 						new ObjectOutputStream(socket.getOutputStream()));
+				
 				Thread t = new Thread(this);
 				t.start();
 
@@ -51,17 +55,6 @@ public class ChatServer implements Runnable {
 		return streamIn;
 	}
 
-	public ObjectOutputStream openOStream() throws IOException {
-		ObjectOutputStream streamOut;
-		streamOut = new ObjectOutputStream(socket.getOutputStream());
-		return streamOut;
-	}
-
-	public void close() throws IOException {
-		if (socket != null)
-			socket.close();
-	}
-
 	@Override
 	public void run() {
 		ObjectInputStream streamIn = null;
@@ -77,27 +70,26 @@ public class ChatServer implements Runnable {
 		while (!done) {
 			try {
 				MessagePacket m = (MessagePacket) streamIn.readObject();
-				//streamIn.reset();
-				//String line = streamIn.readUTF();
-				//System.out.println(socket.getInetAddress() + " and " + socket.isConnected() + " and " + socket.isClosed());
 				System.out.println("To addr = " + m.getAddr());
 				ObjectOutputStream OP = connected.get(m.getAddr());
-				//ObjectOutputStream OP = new ObjectOutputStream(sock.getOutputStream());
-				//System.out.println(sock.getInetAddress() + " and " + sock.isConnected() + " and " + sock.isClosed());
-				//line = streamIn.readUTF();
 				done = m.getMessage().equals(".bye");
 				System.out.println("Message : " + m.getMessage());
 				m.setAddr(temp.getInetAddress().toString().substring(1));
 				OP.writeObject(m);
-				//OP.reset();
-				//OP.writeUTF(temp.getInetAddress().toString().substring(1) + " : " + line);
 			} catch (IOException ioe) {
-				System.out.println("Error");
+				System.out.println("Error - Client Disconnected");
 				done = true;
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+		System.out.println(connected.get(temp.getInetAddress().toString().substring(1)));
+		connected.remove(temp.getInetAddress().toString().substring(1));
+		try {
+			temp.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 	}
