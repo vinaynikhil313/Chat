@@ -65,7 +65,7 @@ public class MainScreen{
 		b = new JButton[5];
 		isOpen = new int[5];
 		for (int i = 0; i < 5; i++) {
-			b[i] = new JButton("172.30.103.79");
+			b[i] = new JButton("172.30.102.178");
 			b[i].addMouseListener(new Buttons(i));
 			b[i].setBackground(C);
 			b[i].setForeground(Color.BLACK);

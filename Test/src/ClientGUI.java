@@ -42,30 +42,31 @@ public class ClientGUI implements ActionListener{
 
 		// We create a bottom JPanel to place everything on.
 		JPanel totalGUI = new JPanel();
+		//totalGUI.setLayout(new GridLayout(0,1));
+		//totalGUI.setLayout(new BorderLayout());
 		totalGUI.setLayout(null);
-
 		// Creation of a Panel to contain the title labels
 		JPanel titlePanel = new JPanel();
-		titlePanel.setLayout(null);
+		//titlePanel.setLayout(null);
 		titlePanel.setLocation(150, 10);
 		titlePanel.setSize(400, 30);
-		totalGUI.add(titlePanel);
+		totalGUI.add(titlePanel, BorderLayout.NORTH);
 
 		JLabel titleLabel = new JLabel("Welcome to Chat");
 		titleLabel.setLocation(0, 0);
-		titleLabel.setSize(100, 30);
-		titleLabel.setHorizontalAlignment(0);
+		titleLabel.setSize(370, 30);
+		//titleLabel.setHorizontalAlignment(0);
 		titleLabel.setForeground(Color.blue);
 		titlePanel.add(titleLabel);
 
 		// Creation of a Panel to contain the score labels.
-		JPanel chatPanel = new JPanel();
-		chatPanel.setLayout(null);
+		JPanel chatPanel = new JPanel(new GridLayout(1,1));
+		//chatPanel.setLayout(null);
 		chatPanel.setLocation(10, 50);
-		chatPanel.setSize(390, 250);
-		totalGUI.add(chatPanel);
+		chatPanel.setSize(370, 250);
+		totalGUI.add(chatPanel, BorderLayout.CENTER);
 
-		chat = new JTextArea("");
+		chat = new JTextArea("asdada");
 		chat.setLocation(0, 0);
 		chat.setSize(370, 230);
 		chat.setLineWrap(true);
@@ -76,8 +77,10 @@ public class ClientGUI implements ActionListener{
 		chat.setEditable(false);
 		chat.setVisible(true);
 		// chat.setHorizontalAlignment(0);
-		chatPanel.add(chat);
+		chatPanel.add(new JScrollPane(chat));
+		//chatPanel.add(chat);
 
+		
 		/*JScrollPane scroll = new JScrollPane (chat);
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -86,10 +89,10 @@ public class ClientGUI implements ActionListener{
 		
 		// Creation of a label to contain all the JButtons.
 		JPanel bottomPanel = new JPanel();
-		bottomPanel.setLayout(null);
-		bottomPanel.setLocation(10, 310);
-		bottomPanel.setSize(370, 70);
-		totalGUI.add(bottomPanel);
+		//bottomPanel.setLayout(null);
+		bottomPanel.setLocation(10, 320);
+		bottomPanel.setSize(400, 70);
+		totalGUI.add(bottomPanel, BorderLayout.SOUTH);
 
 		// We create a button and manipulate it using the syntax we have
 		// used before.
