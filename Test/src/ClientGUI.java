@@ -6,7 +6,6 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 
@@ -64,13 +63,11 @@ public class ClientGUI implements ActionListener{
 		JLabel titleLabel = new JLabel("Welcome to Chat");
 		titleLabel.setLocation(0, 0);
 		titleLabel.setSize(370, 30);
-		//titleLabel.setHorizontalAlignment(0);
 		titleLabel.setForeground(Color.blue);
 		titlePanel.add(titleLabel);
 
 		// Creation of a Panel to contain the score labels.
 		JPanel chatPanel = new JPanel(new GridLayout(1,1));
-		//chatPanel.setLayout(null);
 		chatPanel.setLocation(10, 50);
 		chatPanel.setSize(370, 250);
 		totalGUI.add(chatPanel, BorderLayout.CENTER);
