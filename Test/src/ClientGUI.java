@@ -1,6 +1,8 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -17,7 +19,7 @@ public class ClientGUI implements ActionListener{
 	ObjectOutputStream messageOut = null;
 	ObjectInputStream  messageIn = null;
 	//DataOutputStream messageOut = null;
-	ClientGUI(String toAddr,ObjectOutputStream messageOut, ObjectInputStream  messageIn) {
+	ClientGUI(String toAddr,ObjectOutputStream messageOut, ObjectInputStream  messageIn, final int index) {
 		
 		this.toAddr = toAddr;
 		this.messageOut = messageOut;
@@ -35,7 +37,13 @@ public class ClientGUI implements ActionListener{
 		frame.setLocation(100, 100);
 		frame.setSize(400, 400);
 		frame.setVisible(true);
-		new Messaging(this, messageIn);
+		frame.addWindowListener(new WindowAdapter() {
+		    @Override
+		    public void windowClosing(WindowEvent windowEvent) {
+		        MainScreen.isOpen[index] = 0;
+		    }
+		});
+		new Receiving();
 	}
 
 	private JPanel createContentPane() {
@@ -43,8 +51,8 @@ public class ClientGUI implements ActionListener{
 		// We create a bottom JPanel to place everything on.
 		JPanel totalGUI = new JPanel();
 		//totalGUI.setLayout(new GridLayout(0,1));
-		//totalGUI.setLayout(new BorderLayout());
-		totalGUI.setLayout(null);
+		totalGUI.setLayout(new BorderLayout());
+		//totalGUI.setLayout(null);
 		// Creation of a Panel to contain the title labels
 		JPanel titlePanel = new JPanel();
 		//titlePanel.setLayout(null);
@@ -66,7 +74,7 @@ public class ClientGUI implements ActionListener{
 		chatPanel.setSize(370, 250);
 		totalGUI.add(chatPanel, BorderLayout.CENTER);
 
-		chat = new JTextArea("asdada");
+		chat = new JTextArea("");
 		chat.setLocation(0, 0);
 		chat.setSize(370, 230);
 		chat.setLineWrap(true);
@@ -81,65 +89,29 @@ public class ClientGUI implements ActionListener{
 		//chatPanel.add(chat);
 
 		
-		/*JScrollPane scroll = new JScrollPane (chat);
-		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		chatPanel.add(scroll);*/
-		//scroll.setVisible(true);
-		
-		// Creation of a label to contain all the JButtons.
 		JPanel bottomPanel = new JPanel();
-		//bottomPanel.setLayout(null);
+		bottomPanel.setLayout(new BorderLayout());
 		bottomPanel.setLocation(10, 320);
 		bottomPanel.setSize(400, 70);
 		totalGUI.add(bottomPanel, BorderLayout.SOUTH);
 
-		// We create a button and manipulate it using the syntax we have
-		// used before.
-		newMessage = new JTextField(SwingConstants.LEFT);
-		newMessage.setLocation(0, 0);
-		newMessage.setSize(250, 30);
-		newMessage.requestFocusInWindow();
-		bottomPanel.add(newMessage);
+		newMessage = new JTextField("", SwingConstants.WEST);
+		//newMessage.setLocation(0, 0);
+		//newMessage.setAlignmentX(0);
+		newMessage.setSize(400, 30);
+		bottomPanel.add(newMessage, BorderLayout.WEST);
 
 		sendButton = new JButton("Send");
 		sendButton.setLocation(270, 0);
 		sendButton.setSize(100, 30);
 		sendButton.addActionListener(this);
-		bottomPanel.add(sendButton);
+		//bottomPanel.add(sendButton);
 
 		totalGUI.setOpaque(true);
 		return totalGUI;
 
 	}
 
-	/*private static void createAndShowGUI() {
-
-		JFrame.setDefaultLookAndFeelDecorated(true);
-		JFrame frame = new JFrame("[=] Client [=]");
-
-		// Create and set up the content pane.
-		ClientGUI client = new ClientGUI(toAddr);
-		frame.setContentPane(client.createContentPane());
-
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setLocation(100, 100);
-		frame.setSize(400, 400);
-		frame.setVisible(true);
-	}*/
-
-	/*public static void main(String[] args) {
-		// Schedule a job for the event-dispatching thread:
-		// creating and showing this application's GUI.
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				createAndShowGUI();
-			}
-		});
-	}
-*/
-	
-	
 	void send(String input){
 		
 		System.out.println("EFGH");
@@ -149,9 +121,6 @@ public class ClientGUI implements ActionListener{
 		m.setMessage(input);
 		m.setAddr(toAddr);
 		try {
-			//System.out.println(socket.toString());
-			//ObjectOutputStream messageOut = new ObjectOutputStream(socket.getOutputStream());
-			System.out.println(messageOut);
 			//messageOut.flush();
 			//messageOut.writeUTF(toAddr);
 			
@@ -165,8 +134,6 @@ public class ClientGUI implements ActionListener{
 			e.printStackTrace(System.out);
 			return;
 		}
-		//new Messaging(0, socket, ui);
-		//new Messaging(1, socket, ui);
 		
 	}
 
@@ -178,6 +145,49 @@ public class ClientGUI implements ActionListener{
 			send(message);
 			newMessage.setText("");
 			chat.setText(chat.getText() + "\nME : " + message);
+		}
+
+	}
+	
+	
+	
+
+	public class Receiving implements Runnable {	
+		
+		Thread t = null;
+
+		Receiving() {
+		
+			t = new Thread(this);
+			t.start();
+			
+		}
+		
+		@Override
+		public void run() {
+
+			if(messageIn == null)
+			{
+				System.out.println("NULL");
+				//createStream();
+			}
+			while (true) {
+				try {
+						MessagePacket m = (MessagePacket) messageIn.readObject();
+						//messageIn.reset();
+						chat.setText(chat.getText() + "\n" + m.getAddr() + " : " + m.getMessage());
+						chat.setCaretPosition(chat.getDocument().getLength());
+						System.out.println("From Server " + m.getAddr() + " : " + m.getMessage());
+					//}
+				} catch (IOException e) {
+					System.out.println("Could not read from stream");
+					e.printStackTrace(System.out);
+					return;
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 
 	}

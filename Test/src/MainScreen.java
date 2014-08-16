@@ -22,7 +22,7 @@ public class MainScreen{
 	public static JButton b[] = null;
 	public JButton sendButton2 = null;
 	private static Socket socket = null;
-	private static String serverAddress = "172.30.103.79";
+	private static String serverAddress = "172.30.102.178";
 	private static int serverPort = 8080;
 	Color C = new Color(59, 89, 182);
 	static int isOpen[] = null;
@@ -37,8 +37,8 @@ public class MainScreen{
 		// Creation of a Panel to contain the title labels
 		JPanel titlePanel = new JPanel();
 		titlePanel.setLayout(null);
-		titlePanel.setLocation(150, 10);
-		titlePanel.setSize(100, 30);
+		titlePanel.setLocation(10, 10);
+		titlePanel.setSize(220, 30);
 		totalGUI.add(titlePanel);
 
 		JLabel titleLabel = new JLabel("Main Screen");
@@ -52,7 +52,7 @@ public class MainScreen{
 		JPanel friends = new JPanel();
 		friends.setLayout(null);
 		friends.setLocation(10, 60);
-		friends.setSize(370, 350);
+		friends.setSize(220, 350);
 		totalGUI.add(friends);
 
 		JLabel titleLabel2 = new JLabel("Friends List");
@@ -81,7 +81,7 @@ public class MainScreen{
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.setLayout(null);
 		bottomPanel.setLocation(10, 470);
-		bottomPanel.setSize(370, 70);
+		bottomPanel.setSize(220, 70);
 		totalGUI.add(bottomPanel);
 
 		JLabel titleLabel3 = new JLabel("Add Friend");
@@ -107,7 +107,7 @@ public class MainScreen{
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocation(100, 100);
-		frame.setSize(400, 600);
+		frame.setSize(250, 600);
 		frame.setVisible(true);
 		
 	}
@@ -158,7 +158,7 @@ public class MainScreen{
 			String toAddr = b[index].getText();
 			if(isOpen[index]==0)
 			{
-				new ClientGUI(toAddr, outStream, inStream);
+				new ClientGUI(toAddr, outStream, inStream, index);
 				isOpen[index]=1;
 			}
 	    	
