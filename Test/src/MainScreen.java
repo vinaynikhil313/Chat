@@ -7,6 +7,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -25,9 +27,15 @@ public class MainScreen{
 	private static String serverAddress = "172.30.102.178";
 	private static int serverPort = 8080;
 	Color C = new Color(59, 89, 182);
-	static int isOpen[] = null;
 	static ObjectOutputStream outStream;
 	static ObjectInputStream inStream;
+	static HashMap<String, ClientGUI> openedWindows = null;
+	
+	MainScreen(){
+		openedWindows = new HashMap<String, ClientGUI>();
+		new Receiving();
+	}
+	
 	private JPanel createContentPane() {
 
 		// JPanel to place everything on.
@@ -38,7 +46,7 @@ public class MainScreen{
 		JPanel titlePanel = new JPanel();
 		titlePanel.setLayout(null);
 		titlePanel.setLocation(10, 10);
-		titlePanel.setSize(220, 30);
+		titlePanel.setSize(215, 30);
 		totalGUI.add(titlePanel);
 
 		JLabel titleLabel = new JLabel("Main Screen");
@@ -52,7 +60,7 @@ public class MainScreen{
 		JPanel friends = new JPanel();
 		friends.setLayout(null);
 		friends.setLocation(10, 60);
-		friends.setSize(220, 350);
+		friends.setSize(215, 350);
 		totalGUI.add(friends);
 
 		JLabel titleLabel2 = new JLabel("Friends List");
@@ -63,7 +71,6 @@ public class MainScreen{
 		friends.add(titleLabel2);
 
 		b = new JButton[5];
-		isOpen = new int[5];
 		for (int i = 0; i < 5; i++) {
 			b[i] = new JButton("172.30.102.178");
 			b[i].addMouseListener(new Buttons(i));
@@ -74,14 +81,12 @@ public class MainScreen{
 			b[i].setFocusPainted(false);
 			b[i].setFont(new Font("Tahoma", Font.BOLD, 12));
 			
-			isOpen[i]=0;
-			
 			friends.add(b[i]);
 		}
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.setLayout(null);
 		bottomPanel.setLocation(10, 470);
-		bottomPanel.setSize(220, 70);
+		bottomPanel.setSize(215, 70);
 		totalGUI.add(bottomPanel);
 
 		JLabel titleLabel3 = new JLabel("Add Friend");
@@ -109,7 +114,6 @@ public class MainScreen{
 		frame.setLocation(100, 100);
 		frame.setSize(250, 600);
 		frame.setVisible(true);
-		
 	}
 
 	private static boolean connect() {
@@ -142,6 +146,7 @@ public class MainScreen{
 				createAndShowGUI();
 			}
 		});
+		
 	}
 	
 	class Buttons extends MouseAdapter {
@@ -156,10 +161,10 @@ public class MainScreen{
 			
 	    	b[index].setForeground(Color.BLACK);
 			String toAddr = b[index].getText();
-			if(isOpen[index]==0)
+			if(openedWindows.get(toAddr) == null)
 			{
-				new ClientGUI(toAddr, outStream, inStream, index);
-				isOpen[index]=1;
+				ClientGUI temp = new ClientGUI(toAddr, outStream);
+				openedWindows.put(toAddr, temp);
 			}
 	    	
 		}
@@ -174,6 +179,56 @@ public class MainScreen{
 		public void mouseExited(MouseEvent e) {
 			// TODO Auto-generated method stub
 			b[index].setBackground(C);
+		}
+
+	}
+	
+public class Receiving implements Runnable {	
+		
+		Thread t = null;
+
+		Receiving() {
+		
+			t = new Thread(this);
+			t.start();
+			//t.destroy();
+			
+		}
+		
+		@Override
+		public void run() {
+
+			if(inStream == null)
+			{
+				System.out.println("NULL");
+				//createStream();
+			}
+			while (true) {
+				try {
+						MessagePacket m = (MessagePacket) inStream.readObject();
+						//messageIn.reset();
+						ClientGUI temp = openedWindows.get(m.getFromAddr());
+						if(temp != null)
+						{
+							temp.chat.setText(temp.chat.getText() + "\n" + m.getFromAddr() + " : " + m.getMessage());
+							temp.chat.setCaretPosition(temp.chat.getDocument().getLength());
+							System.out.println("From Server " + m.getFromAddr() + " : " + m.getMessage());
+						}
+						else{
+							ClientGUI create = new ClientGUI(m.getFromAddr(), outStream);
+							openedWindows.put(m.getFromAddr(), create);
+							create.chat.setText(create.chat.getText() + "\n" + m.getFromAddr() + " : " + m.getMessage());
+							create.chat.setCaretPosition(create.chat.getDocument().getLength());
+						}
+				} catch (IOException e) {
+					System.out.println("Could not read from stream");
+					e.printStackTrace(System.out);
+					return;
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 
 	}

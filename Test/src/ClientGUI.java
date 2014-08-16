@@ -18,29 +18,26 @@ public class ClientGUI implements ActionListener{
 	String toAddr;
 	ObjectOutputStream messageOut = null;
 	ObjectInputStream  messageIn = null;
+	//Receiving r = null;
 	//DataOutputStream messageOut = null;
-	ClientGUI(String toAddr,ObjectOutputStream messageOut, ObjectInputStream  messageIn, final int index) {
+	ClientGUI(final String toAddr,ObjectOutputStream messageOut) {
 		
 		this.toAddr = toAddr;
 		this.messageOut = messageOut;
-		this.messageIn = messageIn;
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		JFrame frame = new JFrame("[=] Client [=]");
 
-		// Create and set up the content pane.
-		//ClientGUI client = new ClientGUI(toAddr);
 		frame.setContentPane(this.createContentPane());
 
 		frame.setLocation(100, 100);
 		frame.setSize(400, 400);
 		frame.setVisible(true);
 		frame.addWindowListener(new WindowAdapter() {
-		    @Override
+			@Override
 		    public void windowClosing(WindowEvent windowEvent) {
-		        MainScreen.isOpen[index] = 0;
+		        MainScreen.openedWindows.remove(toAddr);
 		    }
 		});
-		new Receiving();
 	}
 
 	private JPanel createContentPane() {
@@ -116,16 +113,11 @@ public class ClientGUI implements ActionListener{
 		System.out.println("Input = " + input);
 		MessagePacket m = new MessagePacket();
 		m.setMessage(input);
-		m.setAddr(toAddr);
+		m.setToAddr(toAddr);
 		try {
-			//messageOut.flush();
-			//messageOut.writeUTF(toAddr);
 			
 			messageOut.writeObject(m);
-			//messageOut.reset();
-			//messageOut.flush();
-			//messageOut.writeUTF(input.toString());
-			//messageOut.flush();
+			
 		} catch (IOException e) {
 			System.out.println("Could not write to stream");
 			e.printStackTrace(System.out);
@@ -146,47 +138,4 @@ public class ClientGUI implements ActionListener{
 
 	}
 	
-	
-	
-
-	public class Receiving implements Runnable {	
-		
-		Thread t = null;
-
-		Receiving() {
-		
-			t = new Thread(this);
-			t.start();
-			
-		}
-		
-		@Override
-		public void run() {
-
-			if(messageIn == null)
-			{
-				System.out.println("NULL");
-				//createStream();
-			}
-			while (true) {
-				try {
-						MessagePacket m = (MessagePacket) messageIn.readObject();
-						//messageIn.reset();
-						chat.setText(chat.getText() + "\n" + m.getAddr() + " : " + m.getMessage());
-						chat.setCaretPosition(chat.getDocument().getLength());
-						System.out.println("From Server " + m.getAddr() + " : " + m.getMessage());
-					//}
-				} catch (IOException e) {
-					System.out.println("Could not read from stream");
-					e.printStackTrace(System.out);
-					return;
-				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-
-	}
-
 }

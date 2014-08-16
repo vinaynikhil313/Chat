@@ -70,11 +70,11 @@ public class ChatServer implements Runnable {
 		while (!done) {
 			try {
 				MessagePacket m = (MessagePacket) streamIn.readObject();
-				System.out.println("To addr = " + m.getAddr());
-				ObjectOutputStream OP = connected.get(m.getAddr());
+				System.out.println("To addr = " + m.getToAddr());
+				ObjectOutputStream OP = connected.get(m.getToAddr());
 				done = m.getMessage().equals(".bye");
 				System.out.println("Message : " + m.getMessage());
-				m.setAddr(temp.getInetAddress().toString().substring(1));
+				m.setFromAddr(temp.getInetAddress().toString().substring(1));
 				OP.writeObject(m);
 			} catch (IOException ioe) {
 				System.out.println("Error - Client Disconnected");
@@ -83,7 +83,7 @@ public class ChatServer implements Runnable {
 				e.printStackTrace();
 			}
 		}
-		System.out.println(connected.get(temp.getInetAddress().toString().substring(1)));
+		//System.out.println(connected.get(temp.getInetAddress().toString().substring(1)));
 		connected.remove(temp.getInetAddress().toString().substring(1));
 		try {
 			temp.close();
