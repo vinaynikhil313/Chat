@@ -17,7 +17,7 @@ public class FriendsList {
 			try {
 				FileOutputStream fout = new FileOutputStream(f);
 				f.createNewFile();
-				fout.write(count);
+				//fout.write(count);
 				fout.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -35,9 +35,15 @@ public class FriendsList {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		this.count = fin.nextInt();
+		while(fin.hasNextLine())
+		{
+			System.out.println("ABCD");
+			count++;
+			fin.nextLine();
+		}
+		System.out.println("EFGH");
 		fin.close();
-		return this.count;
+		return count;
 	}
 
 	String[] getFriendsList() {
@@ -45,15 +51,15 @@ public class FriendsList {
 		String[] list = null;
 		try {
 			fin = new Scanner(f);
-			fin.nextLine();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		if(count > 0) {
 			list = new String[count];
-			for(int i=0;i<count;i++)
-				list[i] = fin.nextLine();
+			int i=0;
+			while(fin.hasNextLine())
+				list[i++] = fin.nextLine();
 			fin.close();
 		}
 		

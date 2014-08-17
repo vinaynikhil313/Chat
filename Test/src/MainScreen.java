@@ -10,7 +10,6 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashMap;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -28,7 +27,10 @@ public class MainScreen {
 	private static Socket socket = null;
 	private static String serverAddress = "172.30.102.178";
 	private static int serverPort = 8080;
+	private static JFrame frame = null;
 	Color C = new Color(59, 89, 182);
+	private JPanel friends = null;
+	private int i = 0;
 	static ObjectOutputStream outStream;
 	static ObjectInputStream inStream;
 	static HashMap<String, ClientGUI> openedWindows = null;
@@ -46,7 +48,7 @@ public class MainScreen {
 		JPanel totalGUI = new JPanel();
 		totalGUI.setLayout(null);
 		totalGUI.setBackground(C);
-		// Creation of a Panel to contain the title labels
+		
 		JPanel titlePanel = new JPanel();
 		titlePanel.setLayout(null);
 		titlePanel.setLocation(10, 10);
@@ -60,8 +62,7 @@ public class MainScreen {
 		titleLabel.setForeground(Color.blue);
 		titlePanel.add(titleLabel);
 
-		// Creation of a Panel to contain the score labels.
-		JPanel friends = new JPanel();
+		friends = new JPanel();
 		friends.setLayout(null);
 		friends.setLocation(10, 60);
 		friends.setSize(215, 350);
@@ -77,7 +78,7 @@ public class MainScreen {
 		int friendsCount = f.getCount();
 		b = new JButton[friendsCount];
 		String[] list = f.getFriendsList();
-		for (int i = 0; i < friendsCount; i++) {
+		for (i = 0; i < friendsCount; i++) {
 			b[i] = new JButton(list[i]);
 			b[i].addMouseListener(new Buttons(i));
 			b[i].setBackground(C);
@@ -89,7 +90,7 @@ public class MainScreen {
 
 			friends.add(b[i]);
 		}
-		//b[0].setText("172.30.103.79");
+		
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.setLayout(null);
 		bottomPanel.setLocation(10, 470);
@@ -117,6 +118,20 @@ public class MainScreen {
 			public void mouseClicked(MouseEvent arg0) {
 
 				f.addFriend("\r\n" + newFriend.getText());
+				
+				JButton b = new JButton(newFriend.getText());
+				b.addMouseListener(new Buttons(i));
+				b.setBackground(C);
+				b.setForeground(Color.BLACK);
+				b.setSize(150, 30);
+				b.setLocation(10, 40 + 30 * i);
+				b.setFocusPainted(false);
+				b.setFont(new Font("Tahoma", Font.BOLD, 12));
+				//b.setVisible(true);
+				friends.add(b);
+				frame.repaint();
+				i++;
+				newFriend.setText("");
 			}
 		});
 		bottomPanel.add(addButton, BorderLayout.EAST);
@@ -128,7 +143,7 @@ public class MainScreen {
 
 	private static void createAndShowGUI() {
 
-		JFrame frame = new JFrame("[=] Client [=]");
+		frame = new JFrame("[=] Client [=]");
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		// Create and set up the content pane.
 		MainScreen mainScreen = new MainScreen();
@@ -164,6 +179,7 @@ public class MainScreen {
 
 		while (!connect())
 			;
+		
 		// Schedule a job for the event-dispatching thread:
 		// creating and showing this application's GUI.
 		SwingUtilities.invokeLater(new Runnable() {
@@ -175,17 +191,18 @@ public class MainScreen {
 	}
 
 	class Buttons extends MouseAdapter {
-		private final int index;
+		//private final int index;
 
 		public Buttons(int index) {
-			this.index = index;
+			//this.index = index;
 		}
 
 		@Override
-		public void mouseClicked(MouseEvent arg0) {
+		public void mouseClicked(MouseEvent e) {
 
-			b[index].setForeground(Color.BLACK);
-			String toAddr = b[index].getText();
+			JButton tempButton = (JButton) e.getComponent();
+			tempButton.setForeground(Color.BLACK);
+			String toAddr = tempButton.getText();
 			if (openedWindows.get(toAddr) == null) {
 				ClientGUI temp = new ClientGUI(toAddr, outStream);
 				openedWindows.put(toAddr, temp);
@@ -194,14 +211,14 @@ public class MainScreen {
 
 		@Override
 		public void mouseEntered(MouseEvent e) {
-			// TODO Auto-generated method stub
-			b[index].setBackground(Color.WHITE);
+			JButton tempButton = (JButton) e.getComponent();
+			tempButton.setBackground(Color.WHITE);
 		}
 
 		@Override
 		public void mouseExited(MouseEvent e) {
-			// TODO Auto-generated method stub
-			b[index].setBackground(C);
+			JButton tempButton = (JButton) e.getComponent();
+			tempButton.setBackground(C);
 		}
 
 	}
@@ -249,7 +266,6 @@ public class MainScreen {
 					e.printStackTrace(System.out);
 					return;
 				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
