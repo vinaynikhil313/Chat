@@ -37,11 +37,9 @@ public class FriendsList {
 		}
 		while(fin.hasNextLine())
 		{
-			System.out.println("ABCD");
 			count++;
 			fin.nextLine();
 		}
-		System.out.println("EFGH");
 		fin.close();
 		return count;
 	}

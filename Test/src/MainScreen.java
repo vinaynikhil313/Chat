@@ -10,6 +10,9 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.Vector;
+
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -17,11 +20,14 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EtchedBorder;
 
 public class MainScreen {
 
 	public JTextField newFriend = null;
-	public static JButton b[] = null;
+	//public static JButton b[] = null;
+	private static Vector<JLabel> status = null;
+	//public static JLabel[] status = null;
 	public JButton addButton = null;
 	public JButton sendButton2 = null;
 	private static Socket socket = null;
@@ -38,6 +44,7 @@ public class MainScreen {
 
 	MainScreen() {
 		openedWindows = new HashMap<String, ClientGUI>();
+		status = new Vector<JLabel>();
 		f = new FriendsList();
 		new Receiving();
 	}
@@ -53,6 +60,7 @@ public class MainScreen {
 		titlePanel.setLayout(null);
 		titlePanel.setLocation(10, 10);
 		titlePanel.setSize(215, 30);
+		//titlePanel.setBackground(Color.GRAY);
 		totalGUI.add(titlePanel);
 
 		JLabel titleLabel = new JLabel("Main Screen");
@@ -65,7 +73,8 @@ public class MainScreen {
 		friends = new JPanel();
 		friends.setLayout(null);
 		friends.setLocation(10, 60);
-		friends.setSize(215, 350);
+		friends.setSize(265, 350);
+		friends.setBackground(Color.WHITE);
 		totalGUI.add(friends);
 
 		JLabel titleLabel2 = new JLabel("Friends List");
@@ -76,19 +85,39 @@ public class MainScreen {
 		friends.add(titleLabel2);
 
 		int friendsCount = f.getCount();
-		b = new JButton[friendsCount];
+		//b = new JButton[friendsCount];
+		//status = new JLabel[friendsCount];
 		String[] list = f.getFriendsList();
 		for (i = 0; i < friendsCount; i++) {
-			b[i] = new JButton(list[i]);
-			b[i].addMouseListener(new Buttons(i));
-			b[i].setBackground(C);
-			b[i].setForeground(Color.BLACK);
-			b[i].setSize(150, 30);
-			b[i].setLocation(10, 40 + 30 * i);
-			b[i].setFocusPainted(false);
-			b[i].setFont(new Font("Tahoma", Font.BOLD, 12));
+			
+			JPanel temp = new JPanel();
+			temp.setLayout(null);
+			temp.setLocation(10, 40 + 30 * i);
+			temp.setSize(215, 30);
+			temp.setBackground(Color.WHITE);
+			temp.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+			
+			JButton b;
+			b = new JButton(list[i]);
+			b.addMouseListener(new Buttons(i));
+			b.setBackground(C);
+			b.setForeground(Color.BLACK);
+			b.setSize(150, 30);
+			b.setLocation(0, 0);
+			b.setFocusPainted(false);
+			b.setFont(new Font("Tahoma", Font.BOLD, 12));
 
-			friends.add(b[i]);
+			JLabel tempLabel = new JLabel("Offline");
+			tempLabel = new JLabel("Offline");
+			tempLabel.setLocation(160, 0);
+			tempLabel.setSize(50, 30);
+			tempLabel.setBackground(Color.WHITE);
+			status.add(tempLabel);
+			
+			temp.add(b);
+			temp.add(tempLabel);
+			
+			friends.add(temp);
 		}
 		
 		JPanel bottomPanel = new JPanel();
@@ -119,16 +148,33 @@ public class MainScreen {
 
 				f.addFriend("\r\n" + newFriend.getText());
 				
+				JPanel temp = new JPanel();
+				temp.setLayout(null);
+				temp.setLocation(10, 40 + 30 * i);
+				temp.setSize(215, 30);
+				temp.setBackground(Color.WHITE);
+				temp.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+				
 				JButton b = new JButton(newFriend.getText());
 				b.addMouseListener(new Buttons(i));
 				b.setBackground(C);
 				b.setForeground(Color.BLACK);
 				b.setSize(150, 30);
-				b.setLocation(10, 40 + 30 * i);
+				b.setLocation(0, 0);
 				b.setFocusPainted(false);
 				b.setFont(new Font("Tahoma", Font.BOLD, 12));
-				//b.setVisible(true);
-				friends.add(b);
+				
+				JLabel tempLabel = new JLabel("Offline");
+				tempLabel = new JLabel("Offline");
+				tempLabel.setLocation(160, 0);
+				tempLabel.setSize(50, 30);
+				tempLabel.setBackground(Color.WHITE);
+				status.add(tempLabel);
+				
+				temp.add(b);
+				temp.add(tempLabel);
+				
+				friends.add(temp);
 				frame.repaint();
 				i++;
 				newFriend.setText("");
@@ -151,7 +197,8 @@ public class MainScreen {
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocation(100, 100);
-		frame.setSize(250, 600);
+		frame.setSize(300, 600);
+		frame.setBackground(Color.WHITE);
 		frame.setVisible(true);
 	}
 
@@ -231,7 +278,6 @@ public class MainScreen {
 
 			t = new Thread(this);
 			t.start();
-			// t.destroy();
 
 		}
 
