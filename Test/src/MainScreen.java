@@ -10,8 +10,6 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashMap;
-import java.util.Vector;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -25,14 +23,14 @@ import javax.swing.border.EtchedBorder;
 public class MainScreen {
 
 	public JTextField newFriend = null;
-	//public static JButton b[] = null;
-	private static Vector<JLabel> status = null;
-	//public static JLabel[] status = null;
+	// public static JButton b[] = null;
+	private static HashMap<String, JLabel> status = null;
+	// public static JLabel[] status = null;
 	public JButton addButton = null;
 	public JButton sendButton2 = null;
 	private static Socket socket = null;
-	private static String serverAddress = "172.30.102.178";
-	private static int serverPort = 8080;
+	private static String serverAddress = "172.30.103.79";
+	private static int serverPort = 1234;
 	private static JFrame frame = null;
 	Color C = new Color(59, 89, 182);
 	private JPanel friends = null;
@@ -44,7 +42,7 @@ public class MainScreen {
 
 	MainScreen() {
 		openedWindows = new HashMap<String, ClientGUI>();
-		status = new Vector<JLabel>();
+		status = new HashMap<String, JLabel>();
 		f = new FriendsList();
 		new Receiving();
 	}
@@ -55,12 +53,12 @@ public class MainScreen {
 		JPanel totalGUI = new JPanel();
 		totalGUI.setLayout(null);
 		totalGUI.setBackground(C);
-		
+
 		JPanel titlePanel = new JPanel();
 		titlePanel.setLayout(null);
 		titlePanel.setLocation(10, 10);
 		titlePanel.setSize(215, 30);
-		//titlePanel.setBackground(Color.GRAY);
+		// titlePanel.setBackground(Color.GRAY);
 		totalGUI.add(titlePanel);
 
 		JLabel titleLabel = new JLabel("Main Screen");
@@ -85,18 +83,19 @@ public class MainScreen {
 		friends.add(titleLabel2);
 
 		int friendsCount = f.getCount();
-		//b = new JButton[friendsCount];
-		//status = new JLabel[friendsCount];
+		// b = new JButton[friendsCount];
+		// status = new JLabel[friendsCount];
 		String[] list = f.getFriendsList();
 		for (i = 0; i < friendsCount; i++) {
-			
+
 			JPanel temp = new JPanel();
 			temp.setLayout(null);
 			temp.setLocation(10, 40 + 30 * i);
 			temp.setSize(215, 30);
 			temp.setBackground(Color.WHITE);
-			temp.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-			
+			temp.setBorder(BorderFactory
+					.createEtchedBorder(EtchedBorder.LOWERED));
+
 			JButton b;
 			b = new JButton(list[i]);
 			b.addMouseListener(new Buttons(i));
@@ -106,20 +105,30 @@ public class MainScreen {
 			b.setLocation(0, 0);
 			b.setFocusPainted(false);
 			b.setFont(new Font("Tahoma", Font.BOLD, 12));
-
+			
 			JLabel tempLabel = new JLabel("Offline");
 			tempLabel = new JLabel("Offline");
 			tempLabel.setLocation(160, 0);
 			tempLabel.setSize(50, 30);
 			tempLabel.setBackground(Color.WHITE);
-			status.add(tempLabel);
+			status.put(list[i], tempLabel);
 			
 			temp.add(b);
 			temp.add(tempLabel);
+
+			MessagePacket m = new MessagePacket();
+			m.setType(1);
+			m.setFromAddr(null);
+			m.setToAddr(list[i]);
+			try {
+				outStream.writeObject(m);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			
 			friends.add(temp);
 		}
-		
+
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.setLayout(null);
 		bottomPanel.setLocation(10, 470);
@@ -137,24 +146,27 @@ public class MainScreen {
 		newFriend.setLocation(10, 30);
 		newFriend.setSize(120, 25);
 		bottomPanel.add(newFriend, BorderLayout.WEST);
-		
+
 		addButton = new JButton("Add");
 		addButton.setLocation(140, 30);
 		addButton.setSize(50, 25);
 		addButton.setMargin(new Insets(0, 0, 0, 0));
-		addButton.addMouseListener(new MouseAdapter(){
+		addButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 
-				f.addFriend("\r\n" + newFriend.getText());
-				
+				if(f.getCount() > 0)
+					f.addFriend("\r\n" + newFriend.getText());
+				else if(f.getCount() == 0)
+					f.addFriend(newFriend.getText());
 				JPanel temp = new JPanel();
 				temp.setLayout(null);
 				temp.setLocation(10, 40 + 30 * i);
 				temp.setSize(215, 30);
 				temp.setBackground(Color.WHITE);
-				temp.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-				
+				temp.setBorder(BorderFactory
+						.createEtchedBorder(EtchedBorder.LOWERED));
+
 				JButton b = new JButton(newFriend.getText());
 				b.addMouseListener(new Buttons(i));
 				b.setBackground(C);
@@ -163,17 +175,25 @@ public class MainScreen {
 				b.setLocation(0, 0);
 				b.setFocusPainted(false);
 				b.setFont(new Font("Tahoma", Font.BOLD, 12));
-				
+
 				JLabel tempLabel = new JLabel("Offline");
-				tempLabel = new JLabel("Offline");
 				tempLabel.setLocation(160, 0);
 				tempLabel.setSize(50, 30);
 				tempLabel.setBackground(Color.WHITE);
-				status.add(tempLabel);
+				status.put(newFriend.getText(), tempLabel);
 				
+				MessagePacket m = new MessagePacket();
+				m.setType(1);
+				m.setFromAddr(null);
+				m.setToAddr(newFriend.getText());
+				try {
+					outStream.writeObject(m);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				temp.add(b);
 				temp.add(tempLabel);
-				
+
 				friends.add(temp);
 				frame.repaint();
 				i++;
@@ -181,7 +201,7 @@ public class MainScreen {
 			}
 		});
 		bottomPanel.add(addButton, BorderLayout.EAST);
-		
+
 		totalGUI.setOpaque(true);
 		return totalGUI;
 
@@ -226,7 +246,7 @@ public class MainScreen {
 
 		while (!connect())
 			;
-		
+
 		// Schedule a job for the event-dispatching thread:
 		// creating and showing this application's GUI.
 		SwingUtilities.invokeLater(new Runnable() {
@@ -238,10 +258,10 @@ public class MainScreen {
 	}
 
 	class Buttons extends MouseAdapter {
-		//private final int index;
+		// private final int index;
 
 		public Buttons(int index) {
-			//this.index = index;
+			// this.index = index;
 		}
 
 		@Override
@@ -288,8 +308,18 @@ public class MainScreen {
 				System.out.println("NULL");
 			}
 			while (true) {
+
+				MessagePacket m = null;
 				try {
-					MessagePacket m = (MessagePacket) inStream.readObject();
+					m = (MessagePacket) inStream.readObject();
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if (m.getType() == 0) {
 					ClientGUI temp = openedWindows.get(m.getFromAddr());
 					if (temp != null) {
 						temp.chat.setText(temp.chat.getText() + "\n"
@@ -307,12 +337,12 @@ public class MainScreen {
 						create.chat.setCaretPosition(create.chat.getDocument()
 								.getLength());
 					}
-				} catch (IOException e) {
-					System.out.println("Could not read from stream");
-					e.printStackTrace(System.out);
-					return;
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
+				}
+				else if(m.getType() == 1)
+				{
+					JLabel temp = status.get(m.getToAddr());
+					temp.setText(m.getMessage());
+					frame.repaint();
 				}
 			}
 		}

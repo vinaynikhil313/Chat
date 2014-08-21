@@ -3,8 +3,12 @@ import java.io.Serializable;
 
 public class MessagePacket implements Serializable{
 
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
 	String toAddr, fromAddr, message;
+	int type;
 	
 	public String getToAddr() {
 		return toAddr;
@@ -24,5 +28,12 @@ public class MessagePacket implements Serializable{
 	public void setMessage(String message) {
 		this.message = message;
 	}
-
+	public int getType() {
+		return type;
+	}
+	public void setType(int type) {
+		this.type = type;
+	}
+	
+	
 }

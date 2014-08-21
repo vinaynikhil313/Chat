@@ -108,6 +108,7 @@ public class ClientGUI implements ActionListener{
 		System.out.println("EFGH");
 		System.out.println("Input = " + input);
 		MessagePacket m = new MessagePacket();
+		m.setType(0);
 		m.setMessage(input);
 		m.setToAddr(toAddr);
 		try {
