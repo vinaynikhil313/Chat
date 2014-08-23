@@ -124,7 +124,7 @@ public class ChatServer implements Runnable {
 							.toString().substring(1));
 					System.out.println(isPresent);
 					if (isPresent) {
-						m.setMessage("already registered");
+						m.setMessage("already registered:");
 					} else {
 						m.setMessage("not registered");
 					}

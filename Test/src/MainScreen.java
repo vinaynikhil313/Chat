@@ -29,7 +29,7 @@ public class MainScreen {
 	public JButton addButton = null;
 	public JButton sendButton2 = null;
 	private static Socket socket = null;
-	private static String serverAddress = "172.30.103.79";
+	private static String serverAddress = "172.30.102.178";
 	private static int serverPort = 1235;
 	private static JFrame frame = null;
 	Color C = new Color(59, 89, 182);
@@ -55,11 +55,7 @@ public class MainScreen {
 			{
 				if(m.getMessage().equals("not registered"))
 				{
-					RegScreen r = new RegScreen(outStream);
-					//System.out.println("HELLO");
-					//m = (MessagePacket) inStream.readObject();
-					//System.out.println(m.getMessage());
-					//if(m.getMessage().equals("new user registered"))
+					new RegistrationScreen(outStream);
 				}
 			}
 		} catch (IOException e) {
