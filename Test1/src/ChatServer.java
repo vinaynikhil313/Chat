@@ -70,13 +70,13 @@ public class ChatServer implements Runnable {
 		while (!done ) {
 			//try {
 				MessagePacket m = null;
-				System.out.println(temp.isConnected() + " one " + temp.isClosed());
+				//System.out.println(temp.isConnected() + " one " + temp.isClosed());
 				try {
 					m = (MessagePacket) streamIn.readObject();
 				} catch (ClassNotFoundException e) {
 					// TODO Auto-generated catch block
 					done = true;
-					System.out.println(temp.isConnected() + " two " + temp.isClosed());
+					//System.out.println(temp.isConnected() + " two " + temp.isClosed());
 					e.printStackTrace();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
