@@ -3,7 +3,7 @@ import java.sql.*;
 public class DatabaseClass {
 
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	static final String DB_URL = "jdbc:mysql://localhost/DBConnection";
+	static final String DB_URL = "jdbc:mysql://localhost/DB";
 	static final String USER = "root";
 	static final String PASS = "";
 	
@@ -43,13 +43,25 @@ public class DatabaseClass {
 		}
 		try {
 			if(!rs.next())
-				return true;
+				return false;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		return false;
+		return true;
+	}
+	
+	public void addUser(String nick, String ip){
+		
+		String sql = "INSERT INTO `clients` (`cid`, `ip`, `nick`) VALUES (NULL, '" + ip + "', '" + nick + "');";
+		try {
+			if(stmt.executeUpdate(sql) != 1)
+				System.out.println("update error");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void close(){

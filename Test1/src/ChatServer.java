@@ -4,7 +4,7 @@ import java.io.*;
 
 public class ChatServer implements Runnable {
 
-	private int port = 1234;
+	private int port = 1235;
 	private Socket socket = null;
 	private ServerSocket server = null;
 	private HashMap<String, ObjectOutputStream> connected = null;
@@ -13,7 +13,7 @@ public class ChatServer implements Runnable {
 	public ChatServer() {
 
 		db = new DatabaseClass();
-		while(!db.connect())
+		while (!db.connect())
 			;
 		connected = new HashMap<String, ObjectOutputStream>();
 
@@ -119,8 +119,32 @@ public class ChatServer implements Runnable {
 					e.printStackTrace();
 				}
 			} else if (m != null && m.getType() == 2) {
-				boolean notPresent = db.checkUser(temp.getInetAddress().toString().substring(1));
-				System.out.println(notPresent);
+				if (m.getMessage().equals("check")) {
+					boolean isPresent = db.checkUser(temp.getInetAddress()
+							.toString().substring(1));
+					System.out.println(isPresent);
+					if (isPresent) {
+						m.setMessage("already registered");
+					} else {
+						m.setMessage("not registered");
+					}
+					ObjectOutputStream OP = connected.get(temp.getInetAddress()
+							.toString().substring(1));
+					try {
+						OP.writeObject(m);
+						// System.out.println("registration success");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} else {
+					db.addUser(m.getMessage(), temp.getInetAddress().toString()
+							.substring(1));
+					m.setMessage("new user registered");
+					System.out.println("registration success");
+					
+				}
+
 			}
 
 		}

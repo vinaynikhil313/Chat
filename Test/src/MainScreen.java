@@ -29,8 +29,8 @@ public class MainScreen {
 	public JButton addButton = null;
 	public JButton sendButton2 = null;
 	private static Socket socket = null;
-	private static String serverAddress = "172.30.102.178";
-	private static int serverPort = 1234;
+	private static String serverAddress = "172.30.103.79";
+	private static int serverPort = 1235;
 	private static JFrame frame = null;
 	Color C = new Color(59, 89, 182);
 	private JPanel friends = null;
@@ -39,20 +39,38 @@ public class MainScreen {
 	static ObjectInputStream inStream;
 	static HashMap<String, ClientGUI> openedWindows = null;
 	FriendsList f = null;
-
+	static boolean flag = false;
 	MainScreen() {
 		openedWindows = new HashMap<String, ClientGUI>();
 		status = new HashMap<String, JLabel>();
 		f = new FriendsList();
-		new Receiving();
+		
 		MessagePacket m = new MessagePacket();
 		m.setType(2);
+		m.setMessage("check");
 		try {
 			outStream.writeObject(m);
+			m = (MessagePacket) inStream.readObject();
+			if(m.getType()==2)
+			{
+				if(m.getMessage().equals("not registered"))
+				{
+					RegScreen r = new RegScreen(outStream);
+					//System.out.println("HELLO");
+					//m = (MessagePacket) inStream.readObject();
+					//System.out.println(m.getMessage());
+					//if(m.getMessage().equals("new user registered"))
+				}
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		//while(flag==0);
+		new Receiving();
 	}
 
 	private JPanel createContentPane() {

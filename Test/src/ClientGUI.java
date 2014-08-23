@@ -40,7 +40,7 @@ public class ClientGUI implements ActionListener{
 	}
 
 	private JPanel createContentPane() {
-
+		
 		// We create a bottom JPanel to place everything on.
 		JPanel totalGUI = new JPanel();
 		//totalGUI.setLayout(new GridLayout(0,1));
