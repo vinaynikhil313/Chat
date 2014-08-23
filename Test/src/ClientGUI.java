@@ -36,14 +36,7 @@ public class ClientGUI implements ActionListener{
 		    }
 		});
 		frame.getRootPane().setDefaultButton(sendButton);
-		/*
-		 * 
-		 * For each frame, you can set a default button that will automatically listen
-		 *  to the Enter key (and maybe some other event's I'm not aware of).
-		 *  When you hit enter in that frame, the ActionListeners their 
-		 *  actionPerformed() method will be invoked.
-		 * 
-		 */
+
 	}
 
 	private JPanel createContentPane() {

@@ -24,9 +24,12 @@ public class FirstExample {
 			System.out.println("Creating statement...");
 			stmt = conn.createStatement();
 			String sql;
-			sql = "SELECT cid, ip, nick FROM CLIENTS WHERE cid=1";
+			sql = "SELECT cid, ip, nick FROM CLIENTS WHERE cid=4";
 			ResultSet rs = stmt.executeQuery(sql);
 
+			//rs.next();
+			if(!rs.next())
+				System.out.println("Empty");
 			// STEP 5: Extract data from result set
 			while (rs.next()) {
 				// Retrieve by column name

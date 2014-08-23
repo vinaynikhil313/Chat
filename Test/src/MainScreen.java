@@ -45,6 +45,14 @@ public class MainScreen {
 		status = new HashMap<String, JLabel>();
 		f = new FriendsList();
 		new Receiving();
+		MessagePacket m = new MessagePacket();
+		m.setType(2);
+		try {
+			outStream.writeObject(m);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private JPanel createContentPane() {

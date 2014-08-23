@@ -8,9 +8,13 @@ public class ChatServer implements Runnable {
 	private Socket socket = null;
 	private ServerSocket server = null;
 	private HashMap<String, ObjectOutputStream> connected = null;
+	private DatabaseClass db = null;
 
 	public ChatServer() {
 
+		db = new DatabaseClass();
+		while(!db.connect())
+			;
 		connected = new HashMap<String, ObjectOutputStream>();
 
 		try {
@@ -21,23 +25,23 @@ public class ChatServer implements Runnable {
 			System.out.println("Could not create ServerSocket");
 			e.printStackTrace(System.out);
 		}
-		
+
 		System.out.println("Binding to port " + port + ", please wait  ...");
 		System.out.println("Server started: " + server);
-		
+
 		while (true) {
 			try {
-				
+
 				System.out.println("Waiting for a client ...");
-				
+
 				socket = server.accept();
-				
+
 				System.out.println("Client accepted: "
 						+ socket.getInetAddress().toString().substring(1));
-				
+
 				connected.put(socket.getInetAddress().toString().substring(1),
 						new ObjectOutputStream(socket.getOutputStream()));
-				
+
 				Thread t = new Thread(this);
 				t.start();
 
@@ -67,57 +71,63 @@ public class ChatServer implements Runnable {
 		}
 
 		boolean done = false;
-		while (!done ) {
-			//try {
-				MessagePacket m = null;
-				//System.out.println(temp.isConnected() + " one " + temp.isClosed());
+		while (!done) {
+			// try {
+			MessagePacket m = null;
+			// System.out.println(temp.isConnected() + " one " +
+			// temp.isClosed());
+			try {
+				m = (MessagePacket) streamIn.readObject();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				done = true;
+				// System.out.println(temp.isConnected() + " two " +
+				// temp.isClosed());
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				done = true;
+				e.printStackTrace();
+			}
+
+			if (m != null && m.getType() == 0) {
+				System.out.println("To addr = " + m.getToAddr());
+				ObjectOutputStream OP = connected.get(m.getToAddr());
+				done = m.getMessage().equals(".bye");
+				System.out.println("Message : " + m.getMessage());
+				m.setFromAddr(temp.getInetAddress().toString().substring(1));
 				try {
-					m = (MessagePacket) streamIn.readObject();
-				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
-					done = true;
-					//System.out.println(temp.isConnected() + " two " + temp.isClosed());
-					e.printStackTrace();
+					if (OP != null)
+						OP.writeObject(m);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
-					done = true;
 					e.printStackTrace();
 				}
-				
-				if(m != null && m.getType() == 0)
-				{
-					System.out.println("To addr = " + m.getToAddr());
-					ObjectOutputStream OP = connected.get(m.getToAddr());
-					done = m.getMessage().equals(".bye");
-					System.out.println("Message : " + m.getMessage());
-					m.setFromAddr(temp.getInetAddress().toString().substring(1));
-					try {
-						if(OP!= null) OP.writeObject(m);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+			} else if (m != null && m.getType() == 1) {
+				if (connected.get(m.getToAddr()) == null) {
+					m.setMessage("offline");
+				} else {
+					m.setMessage("online");
 				}
-				else if(m != null && m.getType() == 1)
-				{
-					if(connected.get(m.getToAddr()) == null) {m.setMessage("offline");}
-					else {m.setMessage("online");}
-					ObjectOutputStream OP = connected.get(temp.getInetAddress().toString().substring(1));
-					try {
-						OP.writeObject(m);
-						System.out.println("sent");
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+				ObjectOutputStream OP = connected.get(temp.getInetAddress()
+						.toString().substring(1));
+				try {
+					OP.writeObject(m);
+					System.out.println("sent");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-			
+			} else if (m != null && m.getType() == 2) {
+				boolean notPresent = db.checkUser(temp.getInetAddress().toString().substring(1));
+				System.out.println(notPresent);
+			}
+
 		}
-		//System.out.println(connected.get(temp.getInetAddress().toString().substring(1)));
+		// System.out.println(connected.get(temp.getInetAddress().toString().substring(1)));
 		connected.remove(temp.getInetAddress().toString().substring(1));
 		System.out.println("client disconnected");
-		for(String key: connected.keySet())
-		{
+		for (String key : connected.keySet()) {
 			ObjectOutputStream OP = connected.get(key);
 			MessagePacket m = new MessagePacket();
 			m.setToAddr(temp.getInetAddress().toString().substring(1));
@@ -141,6 +151,6 @@ public class ChatServer implements Runnable {
 	public static void main(String args[]) {
 
 		new ChatServer();
-		
+
 	}
 }
