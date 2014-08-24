@@ -4,13 +4,14 @@ import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashMap;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -31,8 +32,8 @@ public class MainScreen {
 	public JButton addButton = null;
 	public JButton sendButton2 = null;
 	private static Socket socket = null;
-	private static String serverAddress = "172.30.102.178";
-	private static int serverPort = 1235;
+	private static String serverAddress = "172.30.103.79";
+	private static int serverPort = 1237;
 	private static JFrame frame = null;
 	Color C = new Color(59, 89, 182);
 	private JPanel friends = null;
@@ -41,7 +42,9 @@ public class MainScreen {
 	static ObjectInputStream inStream;
 	static HashMap<String, ClientGUI> openedWindows = null;
 	FriendsList f = null;
+	public static boolean done = false;
 	static boolean flag = false;
+	public static String myNick = null;
 
 	MainScreen() {
 		openedWindows = new HashMap<String, ClientGUI>();
@@ -58,15 +61,23 @@ public class MainScreen {
 				if (m.getMessage().equals("not registered")) {
 					new RegistrationScreen(outStream);
 					m = (MessagePacket) inStream.readObject();
-					while (!m.getMessage().equals("new user registered")) {
-						if(m.getMessage().equals("nick already exists")){
-							JOptionPane.showMessageDialog(null,
-									"Username already exists, please enter a new one", "ERROR", 1);
+					while (m.getMessage().equals("nick already exists")) {
+						// if (m.getMessage().equals("nick already exists"))
+						{
+							JOptionPane
+									.showMessageDialog(
+											null,
+											"Username already exists, please enter a new one",
+											"ERROR", 1);
 						}
 						new RegistrationScreen(outStream);
 						m = (MessagePacket) inStream.readObject();
-					} 
+						// myNick = m.getMessage();
+					}
+
 				}
+				myNick = m.getMessage();
+
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -150,7 +161,7 @@ public class MainScreen {
 
 			MessagePacket m = new MessagePacket();
 			m.setType(1);
-			m.setFromAddr(null);
+			m.setFromAddr(myNick);
 			m.setToAddr(list[i]);
 			try {
 				outStream.writeObject(m);
@@ -187,49 +198,17 @@ public class MainScreen {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 
-				if (f.getCount() > 0)
-					f.addFriend("\r\n" + newFriend.getText());
-				else if (f.getCount() == 0)
-					f.addFriend(newFriend.getText());
-				JPanel temp = new JPanel();
-				temp.setLayout(null);
-				temp.setLocation(10, 40 + 30 * i);
-				temp.setSize(215, 30);
-				temp.setBackground(Color.WHITE);
-				temp.setBorder(BorderFactory
-						.createEtchedBorder(EtchedBorder.LOWERED));
-
-				JButton b = new JButton(newFriend.getText());
-				b.addMouseListener(new Buttons(i));
-				b.setBackground(C);
-				b.setForeground(Color.BLACK);
-				b.setSize(150, 30);
-				b.setLocation(0, 0);
-				b.setFocusPainted(false);
-				b.setFont(new Font("Tahoma", Font.BOLD, 12));
-
-				JLabel tempLabel = new JLabel("Offline");
-				tempLabel.setLocation(160, 0);
-				tempLabel.setSize(50, 30);
-				tempLabel.setBackground(Color.WHITE);
-				status.put(newFriend.getText(), tempLabel);
-
 				MessagePacket m = new MessagePacket();
 				m.setType(1);
-				m.setFromAddr(null);
+				m.setFromAddr(myNick);
 				m.setToAddr(newFriend.getText());
 				try {
 					outStream.writeObject(m);
+					// m = (MessagePacket) inStream.readObject();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				temp.add(b);
-				temp.add(tempLabel);
 
-				friends.add(temp);
-				frame.repaint();
-				i++;
-				newFriend.setText("");
 			}
 		});
 		bottomPanel.add(addButton, BorderLayout.EAST);
@@ -237,6 +216,42 @@ public class MainScreen {
 		totalGUI.setOpaque(true);
 		return totalGUI;
 
+	}
+
+	private void addFriend() {
+		if (f.getCount() > 0)
+			f.addFriend("\r\n" + newFriend.getText());
+		else if (f.getCount() == 0)
+			f.addFriend(newFriend.getText());
+		JPanel temp = new JPanel();
+		temp.setLayout(null);
+		temp.setLocation(10, 40 + 30 * i);
+		temp.setSize(215, 30);
+		temp.setBackground(Color.WHITE);
+		temp.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+
+		JButton b = new JButton(newFriend.getText());
+		b.addMouseListener(new Buttons(i));
+		b.setBackground(C);
+		b.setForeground(Color.BLACK);
+		b.setSize(150, 30);
+		b.setLocation(0, 0);
+		b.setFocusPainted(false);
+		b.setFont(new Font("Tahoma", Font.BOLD, 12));
+
+		JLabel tempLabel = new JLabel("Offline");
+		tempLabel.setLocation(160, 0);
+		tempLabel.setSize(50, 30);
+		tempLabel.setBackground(Color.WHITE);
+		status.put(newFriend.getText(), tempLabel);
+
+		temp.add(b);
+		temp.add(tempLabel);
+
+		friends.add(temp);
+		frame.repaint();
+		i++;
+		newFriend.setText("");
 	}
 
 	private static void createAndShowGUI() {
@@ -252,6 +267,27 @@ public class MainScreen {
 		frame.setSize(300, 600);
 		frame.setBackground(Color.WHITE);
 		frame.setVisible(true);
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent windowEvent) {
+				// if (JOptionPane.showConfirmDialog(frame,
+				// "Are you sure to close this window?", "Really Closing?",
+				// JOptionPane.YES_NO_OPTION,
+				// JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+				MessagePacket m = new MessagePacket();
+				m.setFromAddr(myNick);
+				m.setType(3);
+				try {
+					outStream.writeObject(m);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				done = true;
+				System.exit(0);
+			}
+			// }
+		});
 	}
 
 	private static boolean connect() {
@@ -269,6 +305,8 @@ public class MainScreen {
 			return false;
 		} catch (IOException ioe) {
 			System.out.println("Could not load data stream....Retry");
+			JOptionPane.showMessageDialog(null,
+					"Server down...Try again later", "ERROR", 1);
 			return false;
 		}
 		return true;
@@ -276,9 +314,7 @@ public class MainScreen {
 
 	public static void main(String[] args) {
 
-		while (!connect())
-			;
-
+		connect();
 		// Schedule a job for the event-dispatching thread:
 		// creating and showing this application's GUI.
 		SwingUtilities.invokeLater(new Runnable() {
@@ -339,11 +375,15 @@ public class MainScreen {
 			if (inStream == null) {
 				System.out.println("NULL");
 			}
-			while (true) {
+			while (!done) {
 
 				MessagePacket m = null;
 				try {
+					// if (inStream.available() > 0)
+					System.out.println("insream available "
+							+ inStream.available());
 					m = (MessagePacket) inStream.readObject();
+
 				} catch (ClassNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -351,7 +391,7 @@ public class MainScreen {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				if (m.getType() == 0) {
+				if (m != null && m.getType() == 0) {
 					ClientGUI temp = openedWindows.get(m.getFromAddr());
 					if (temp != null) {
 						temp.chat.setText(temp.chat.getText() + "\n"
@@ -369,10 +409,45 @@ public class MainScreen {
 						create.chat.setCaretPosition(create.chat.getDocument()
 								.getLength());
 					}
-				} else if (m.getType() == 1) {
-					JLabel temp = status.get(m.getToAddr());
-					temp.setText(m.getMessage());
-					frame.repaint();
+				} else if (m != null && (m.getType() == 1 || m.getType() == 3)) {
+					if (!m.getMessage().equals("does not exist")) {
+
+						JLabel temp = status.get(m.getToAddr());
+						if (temp != null) {
+							temp.setText(m.getMessage());
+							if(m.getMessage().equals("online"))
+							{
+								//temp.setBackground(Color.GREEN);
+								temp.getParent().setBackground(Color.GREEN);
+							}
+							else
+							{
+								//temp.setBackground(Color.RED);
+								temp.getParent().setBackground(Color.RED);
+							}
+								
+						} else if (m.getType() == 1) {
+							addFriend();
+							JLabel temp2 = status.get(m.getToAddr());
+							temp2.setText(m.getMessage());
+							if(m.getMessage().equals("online"))
+							{
+								//temp2.setBackground(Color.GREEN);
+								temp2.getParent().setBackground(Color.GREEN);
+							}
+							else
+							{
+								//temp2.setBackground(Color.RED);
+								temp2.getParent().setBackground(Color.RED);
+							}
+
+						}
+						frame.repaint();
+					} else if (m.getType() == 1) {
+						JOptionPane.showMessageDialog(null,
+								"there exists no user with this username",
+								"ERROR", 1);
+					}
 				}
 			}
 		}

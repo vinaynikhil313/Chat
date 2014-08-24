@@ -4,7 +4,7 @@ import java.io.*;
 
 public class ChatServer implements Runnable {
 
-	private int port = 1235;
+	private int port = 1237;
 	private Socket socket = null;
 	private ServerSocket server = null;
 	private HashMap<String, ObjectOutputStream> connected = null;
@@ -36,11 +36,21 @@ public class ChatServer implements Runnable {
 
 				socket = server.accept();
 
-				System.out.println("Client accepted: "
-						+ socket.getInetAddress().toString().substring(1));
+				// System.out.println("Client accepted: "
+				// + socket.getInetAddress().toString().substring(1));
 
-				connected.put(socket.getInetAddress().toString().substring(1),
-						new ObjectOutputStream(socket.getOutputStream()));
+				String temp = db.getNick(socket.getInetAddress().toString()
+						.substring(1));
+				System.out.println("Client accepted: "
+						+ socket.getInetAddress().toString().substring(1)
+						+ " nick " + temp);
+				if (temp != null)
+					connected.put(temp,
+							new ObjectOutputStream(socket.getOutputStream()));
+				else
+					connected.put(
+							socket.getInetAddress().toString().substring(1),
+							new ObjectOutputStream(socket.getOutputStream()));
 
 				Thread t = new Thread(this);
 				t.start();
@@ -95,7 +105,7 @@ public class ChatServer implements Runnable {
 				ObjectOutputStream OP = connected.get(m.getToAddr());
 				done = m.getMessage().equals(".bye");
 				System.out.println("Message : " + m.getMessage());
-				m.setFromAddr(temp.getInetAddress().toString().substring(1));
+				// m.setFromAddr(temp.getInetAddress().toString().substring(1));
 				try {
 					if (OP != null)
 						OP.writeObject(m);
@@ -104,13 +114,21 @@ public class ChatServer implements Runnable {
 					e.printStackTrace();
 				}
 			} else if (m != null && m.getType() == 1) {
-				if (connected.get(m.getToAddr()) == null) {
-					m.setMessage("offline");
-				} else {
-					m.setMessage("online");
+
+				boolean isPresent = db.checkUser(1, m.getToAddr());
+				if (isPresent) {
+					if (connected.get(m.getToAddr()) == null) {
+						m.setMessage("offline");
+					} else {
+						m.setMessage("online");
+					}
 				}
-				ObjectOutputStream OP = connected.get(temp.getInetAddress()
-						.toString().substring(1));
+				else
+				{
+					m.setMessage("does not exist");
+				}
+
+				ObjectOutputStream OP = connected.get(m.getFromAddr());
 				try {
 					OP.writeObject(m);
 					System.out.println("sent");
@@ -120,54 +138,94 @@ public class ChatServer implements Runnable {
 				}
 			} else if (m != null && m.getType() == 2) {
 				if (m.getMessage().equals("check")) {
-					boolean isPresent = db.checkUser(0, temp.getInetAddress()
+					// boolean isPresent = db.checkUser(0, temp.getInetAddress()
+					// .toString().substring(1));
+					String tempNick = db.getNick(temp.getInetAddress()
 							.toString().substring(1));
-					System.out.println(isPresent);
-					if (isPresent) {
-						m.setMessage("already registered:");
+					System.out.println(tempNick);
+					ObjectOutputStream OP = null;
+					if (tempNick != null) {
+						m.setMessage(tempNick);
+						OP = connected.get(tempNick);
 					} else {
 						m.setMessage("not registered");
+						OP = connected.get(temp.getInetAddress().toString()
+								.substring(1));
+					}
+
+					try {
+						OP.writeObject(m);
+						// System.out.println("registration success");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 				} else {
 					if (!db.checkUser(1, m.getMessage())) {
 						db.addUser(m.getMessage(), temp.getInetAddress()
 								.toString().substring(1));
-						m.setMessage("new user registered");
+
+						// m.setMessage("new user registered");
 						System.out.println("registration success");
-					}
-					else{
+
+						ObjectOutputStream OP = connected.get(temp
+								.getInetAddress().toString().substring(1));
+						try {
+							OP.writeObject(m);
+							// System.out.println("registration success");
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						connected.remove(temp.getInetAddress().toString()
+								.substring(1));
+						connected.put(m.getMessage(), OP);
+
+					} else {
 						m.setMessage("nick already exists");
+						ObjectOutputStream OP = connected.get(temp
+								.getInetAddress().toString().substring(1));
+						try {
+							OP.writeObject(m);
+							// System.out.println("registration success");
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
-				}
-				ObjectOutputStream OP = connected.get(temp.getInetAddress()
-						.toString().substring(1));
-				try {
-					OP.writeObject(m);
-					// System.out.println("registration success");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
 
+			} else if (m != null && m.getType() == 3) {
+				connected.remove(m.getFromAddr());
+				System.out.println("client disconnected");
+				for (String key : connected.keySet()) {
+					ObjectOutputStream OP = connected.get(key);
+					MessagePacket m2 = new MessagePacket();
+					m2.setToAddr(m.getFromAddr());
+					m2.setType(3);
+					m2.setMessage("offline");
+					try {
+						OP.writeObject(m2);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				done = true;
 			}
 
 		}
 		// System.out.println(connected.get(temp.getInetAddress().toString().substring(1)));
-		connected.remove(temp.getInetAddress().toString().substring(1));
-		System.out.println("client disconnected");
-		for (String key : connected.keySet()) {
-			ObjectOutputStream OP = connected.get(key);
-			MessagePacket m = new MessagePacket();
-			m.setToAddr(temp.getInetAddress().toString().substring(1));
-			m.setType(1);
-			m.setMessage("offline");
-			try {
-				OP.writeObject(m);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		// connected.remove(temp.getInetAddress().toString().substring(1));
+		// System.out.println("client disconnected");
+		/*
+		 * for (String key : connected.keySet()) { ObjectOutputStream OP =
+		 * connected.get(key); MessagePacket m = new MessagePacket();
+		 * m.setToAddr(temp.getInetAddress().toString().substring(1));
+		 * m.setType(1); m.setMessage("offline"); try { OP.writeObject(m); }
+		 * catch (IOException e) { // TODO Auto-generated catch block
+		 * e.printStackTrace(); } }
+		 */
 		try {
 			temp.close();
 		} catch (IOException e) {

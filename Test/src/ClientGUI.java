@@ -9,20 +9,21 @@ import java.io.ObjectOutputStream;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 
-public class ClientGUI implements ActionListener{
+public class ClientGUI implements ActionListener {
 
 	public JTextArea chat = null;
 	public JTextField newMessage = null;
 	public JButton sendButton = null;
 	String toAddr;
 	ObjectOutputStream messageOut = null;
-	ObjectInputStream  messageIn = null;
+	ObjectInputStream messageIn = null;
+
 	ClientGUI(final String toAddr, ObjectOutputStream messageOut) {
-		
+
 		this.toAddr = toAddr;
 		this.messageOut = messageOut;
 		JFrame.setDefaultLookAndFeelDecorated(true);
-		JFrame frame = new JFrame("[=] Client [=]");
+		JFrame frame = new JFrame("[=] " + toAddr + " [=]");
 
 		frame.setContentPane(this.createContentPane());
 
@@ -31,24 +32,24 @@ public class ClientGUI implements ActionListener{
 		frame.setVisible(true);
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
-		    public void windowClosing(WindowEvent windowEvent) {
-		        MainScreen.openedWindows.remove(toAddr);
-		    }
+			public void windowClosing(WindowEvent windowEvent) {
+				MainScreen.openedWindows.remove(toAddr);
+			}
 		});
 		frame.getRootPane().setDefaultButton(sendButton);
 
 	}
 
 	private JPanel createContentPane() {
-		
+
 		// We create a bottom JPanel to place everything on.
 		JPanel totalGUI = new JPanel();
-		//totalGUI.setLayout(new GridLayout(0,1));
+		// totalGUI.setLayout(new GridLayout(0,1));
 		totalGUI.setLayout(new BorderLayout());
-		//totalGUI.setLayout(null);
+		// totalGUI.setLayout(null);
 		// Creation of a Panel to contain the title labels
 		JPanel titlePanel = new JPanel();
-		//titlePanel.setLayout(null);
+		// titlePanel.setLayout(null);
 		titlePanel.setLocation(150, 10);
 		titlePanel.setSize(400, 30);
 		totalGUI.add(titlePanel, BorderLayout.NORTH);
@@ -60,7 +61,7 @@ public class ClientGUI implements ActionListener{
 		titlePanel.add(titleLabel);
 
 		// Creation of a Panel to contain the score labels.
-		JPanel chatPanel = new JPanel(new GridLayout(1,1));
+		JPanel chatPanel = new JPanel(new GridLayout(1, 1));
 		chatPanel.setLocation(10, 50);
 		chatPanel.setSize(370, 250);
 		totalGUI.add(chatPanel, BorderLayout.CENTER);
@@ -75,7 +76,6 @@ public class ClientGUI implements ActionListener{
 		chat.setVisible(true);
 		chatPanel.add(new JScrollPane(chat));
 
-		
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.setLayout(new BorderLayout());
 		bottomPanel.setLocation(10, 320);
@@ -96,24 +96,25 @@ public class ClientGUI implements ActionListener{
 
 	}
 
-	void send(String input){
-		
+	void send(String input) {
+
 		System.out.println("EFGH");
 		System.out.println("Input = " + input);
 		MessagePacket m = new MessagePacket();
+		m.setFromAddr(MainScreen.myNick);
 		m.setType(0);
 		m.setMessage(input);
 		m.setToAddr(toAddr);
 		try {
-			
+
 			messageOut.writeObject(m);
-			
+
 		} catch (IOException e) {
 			System.out.println("Could not write to stream");
 			e.printStackTrace(System.out);
 			return;
 		}
-		
+
 	}
 
 	@Override
@@ -121,9 +122,12 @@ public class ClientGUI implements ActionListener{
 
 		if (e.getSource() == sendButton) {
 			String message = newMessage.getText();
-			send(message);
-			newMessage.setText("");
-			chat.setText(chat.getText() + "\nME : " + message);
+			if (!message.equals("")) {
+				chat.setText(chat.getText() + "\nME : " + message);
+				send(message);
+				newMessage.setText("");
+
+			}
 		}
 
 	}

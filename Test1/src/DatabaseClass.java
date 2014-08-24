@@ -3,7 +3,7 @@ import java.sql.*;
 public class DatabaseClass {
 
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	static final String DB_URL = "jdbc:mysql://localhost/DBConnection";
+	static final String DB_URL = "jdbc:mysql://localhost/DB";
 	static final String USER = "root";
 	static final String PASS = "";
 
@@ -76,6 +76,23 @@ public class DatabaseClass {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public String getNick(String ip) {
+		// TODO Auto-generated method stub
+		String sql = "SELECT NICK FROM CLIENTS WHERE IP = '" + ip + "';";
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			if(rs.next())
+			{
+				return rs.getString("NICK");
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }
