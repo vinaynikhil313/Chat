@@ -10,10 +10,12 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -40,22 +42,30 @@ public class MainScreen {
 	static HashMap<String, ClientGUI> openedWindows = null;
 	FriendsList f = null;
 	static boolean flag = false;
+
 	MainScreen() {
 		openedWindows = new HashMap<String, ClientGUI>();
 		status = new HashMap<String, JLabel>();
 		f = new FriendsList();
-		
+
 		MessagePacket m = new MessagePacket();
 		m.setType(2);
 		m.setMessage("check");
 		try {
 			outStream.writeObject(m);
 			m = (MessagePacket) inStream.readObject();
-			if(m.getType()==2)
-			{
-				if(m.getMessage().equals("not registered"))
-				{
+			if (m.getType() == 2) {
+				if (m.getMessage().equals("not registered")) {
 					new RegistrationScreen(outStream);
+					m = (MessagePacket) inStream.readObject();
+					while (!m.getMessage().equals("new user registered")) {
+						if(m.getMessage().equals("nick already exists")){
+							JOptionPane.showMessageDialog(null,
+									"Username already exists, please enter a new one", "ERROR", 1);
+						}
+						new RegistrationScreen(outStream);
+						m = (MessagePacket) inStream.readObject();
+					} 
 				}
 			}
 		} catch (IOException e) {
@@ -65,7 +75,7 @@ public class MainScreen {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//while(flag==0);
+		// while(flag==0);
 		new Receiving();
 	}
 
@@ -127,14 +137,14 @@ public class MainScreen {
 			b.setLocation(0, 0);
 			b.setFocusPainted(false);
 			b.setFont(new Font("Tahoma", Font.BOLD, 12));
-			
+
 			JLabel tempLabel = new JLabel("Offline");
 			tempLabel = new JLabel("Offline");
 			tempLabel.setLocation(160, 0);
 			tempLabel.setSize(50, 30);
 			tempLabel.setBackground(Color.WHITE);
 			status.put(list[i], tempLabel);
-			
+
 			temp.add(b);
 			temp.add(tempLabel);
 
@@ -147,7 +157,7 @@ public class MainScreen {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
+
 			friends.add(temp);
 		}
 
@@ -177,9 +187,9 @@ public class MainScreen {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 
-				if(f.getCount() > 0)
+				if (f.getCount() > 0)
 					f.addFriend("\r\n" + newFriend.getText());
-				else if(f.getCount() == 0)
+				else if (f.getCount() == 0)
 					f.addFriend(newFriend.getText());
 				JPanel temp = new JPanel();
 				temp.setLayout(null);
@@ -203,7 +213,7 @@ public class MainScreen {
 				tempLabel.setSize(50, 30);
 				tempLabel.setBackground(Color.WHITE);
 				status.put(newFriend.getText(), tempLabel);
-				
+
 				MessagePacket m = new MessagePacket();
 				m.setType(1);
 				m.setFromAddr(null);
@@ -359,9 +369,7 @@ public class MainScreen {
 						create.chat.setCaretPosition(create.chat.getDocument()
 								.getLength());
 					}
-				}
-				else if(m.getType() == 1)
-				{
+				} else if (m.getType() == 1) {
 					JLabel temp = status.get(m.getToAddr());
 					temp.setText(m.getMessage());
 					frame.repaint();

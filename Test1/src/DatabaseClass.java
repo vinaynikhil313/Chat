@@ -6,11 +6,11 @@ public class DatabaseClass {
 	static final String DB_URL = "jdbc:mysql://localhost/DBConnection";
 	static final String USER = "root";
 	static final String PASS = "";
-	
+
 	Connection conn = null;
 	Statement stmt = null;
-	
-	public boolean connect(){
+
+	public boolean connect() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			System.out.println("Connecting to database...");
@@ -26,13 +26,16 @@ public class DatabaseClass {
 			e.printStackTrace();
 			return false;
 		}
-		
+
 		return true;
 	}
-	
-	public boolean checkUser(String ip){
-		
-		String sql = "SELECT NICK FROM CLIENTS WHERE IP='" + ip + "'";
+
+	public boolean checkUser(int flag, String text) {
+		String sql = "SELECT NICK FROM CLIENTS WHERE ";
+		if (flag == 0)
+			sql = sql + "IP='" + text + "';";
+		else
+			sql = sql + "NICK='" + text + "';";
 		System.out.println(sql);
 		ResultSet rs = null;
 		try {
@@ -42,29 +45,30 @@ public class DatabaseClass {
 			e.printStackTrace();
 		}
 		try {
-			if(!rs.next())
+			if (!rs.next())
 				return false;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return true;
 	}
-	
-	public void addUser(String nick, String ip){
-		
-		String sql = "INSERT INTO `clients` (`cid`, `ip`, `nick`) VALUES (NULL, '" + ip + "', '" + nick + "');";
+
+	public void addUser(String nick, String ip) {
+
+		String sql = "INSERT INTO `clients` (`cid`, `ip`, `nick`) VALUES (NULL, '"
+				+ ip + "', '" + nick + "');";
 		try {
-			if(stmt.executeUpdate(sql) != 1)
+			if (stmt.executeUpdate(sql) != 1)
 				System.out.println("update error");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
-	public void close(){
+
+	public void close() {
 		try {
 			conn.close();
 			stmt.close();
@@ -73,5 +77,5 @@ public class DatabaseClass {
 			e.printStackTrace();
 		}
 	}
-	
+
 }

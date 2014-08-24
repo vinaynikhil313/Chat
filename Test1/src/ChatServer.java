@@ -120,7 +120,7 @@ public class ChatServer implements Runnable {
 				}
 			} else if (m != null && m.getType() == 2) {
 				if (m.getMessage().equals("check")) {
-					boolean isPresent = db.checkUser(temp.getInetAddress()
+					boolean isPresent = db.checkUser(0, temp.getInetAddress()
 							.toString().substring(1));
 					System.out.println(isPresent);
 					if (isPresent) {
@@ -128,21 +128,25 @@ public class ChatServer implements Runnable {
 					} else {
 						m.setMessage("not registered");
 					}
-					ObjectOutputStream OP = connected.get(temp.getInetAddress()
-							.toString().substring(1));
-					try {
-						OP.writeObject(m);
-						// System.out.println("registration success");
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
 				} else {
-					db.addUser(m.getMessage(), temp.getInetAddress().toString()
-							.substring(1));
-					m.setMessage("new user registered");
-					System.out.println("registration success");
-					
+					if (!db.checkUser(1, m.getMessage())) {
+						db.addUser(m.getMessage(), temp.getInetAddress()
+								.toString().substring(1));
+						m.setMessage("new user registered");
+						System.out.println("registration success");
+					}
+					else{
+						m.setMessage("nick already exists");
+					}
+				}
+				ObjectOutputStream OP = connected.get(temp.getInetAddress()
+						.toString().substring(1));
+				try {
+					OP.writeObject(m);
+					// System.out.println("registration success");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 
 			}
