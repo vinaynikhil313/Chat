@@ -408,16 +408,16 @@ public class MainScreen {
 					} else {
 						boolean flagged = true;
 						int res = JOptionPane.showConfirmDialog(null,
-								"Do you want to save it?", "Incoming file",
+								"Do you want to save it?", "Incoming file " +m.getMessage(),
 								JOptionPane.OK_CANCEL_OPTION,
 								JOptionPane.PLAIN_MESSAGE);
 						if (res == JOptionPane.OK_OPTION) {
 							JFileChooser fc = new JFileChooser();
+							fc.setSelectedFile(new File(m.getMessage()));
 							int returnVal = fc.showSaveDialog(temp.frame);
 							File file = null;
 							if (returnVal == JFileChooser.APPROVE_OPTION) {
 								file = fc.getSelectedFile();
-
 								
 								while (file.exists()) {
 									int result = JOptionPane
@@ -433,6 +433,7 @@ public class MainScreen {
 									// if yes {break}
 									else {
 										fc = new JFileChooser();
+										fc.setSelectedFile( new File(m.getMessage()));
 										returnVal = fc
 												.showSaveDialog(temp.frame);
 										if (returnVal == JFileChooser.APPROVE_OPTION)
