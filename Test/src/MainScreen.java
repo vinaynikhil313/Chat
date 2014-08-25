@@ -406,18 +406,46 @@ public class MainScreen {
 						temp.chat.setCaretPosition(temp.chat.getDocument()
 								.getLength());
 					} else {
-						final JFileChooser fc = new JFileChooser();
+						JFileChooser fc = new JFileChooser();
 						int returnVal = fc.showSaveDialog(temp.frame);
 						File file = null;
 						if (returnVal == JFileChooser.APPROVE_OPTION) {
 							file = fc.getSelectedFile();
-							System.out.println(file.getAbsolutePath());
-							try {
-								Files.write(file.toPath(), m.getFileBytes());
 
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
+							boolean flag = true;
+							while (file.exists()) {
+								int result = JOptionPane
+										.showConfirmDialog(
+												null,
+												"File already exists, do you want to overwrite?",
+												"Error",
+												JOptionPane.OK_CANCEL_OPTION,
+												JOptionPane.PLAIN_MESSAGE);
+								// show overwrite option yes or no
+								if (result == JOptionPane.OK_OPTION)
+									break;
+								// if yes {break}
+								else {
+									fc = new JFileChooser();
+									returnVal = fc.showSaveDialog(temp.frame);
+									if (returnVal == JFileChooser.APPROVE_OPTION)
+										file = fc.getSelectedFile();
+									else {
+										flag = false;
+										break;
+									}
+								}
+								// else{new FileChooser; }
+							}
+							if (flag) {
+								System.out.println(file.getAbsolutePath());
+								try {
+									Files.write(file.toPath(), m.getFileBytes());
+
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 							}
 						}
 					}
