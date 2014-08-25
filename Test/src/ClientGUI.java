@@ -3,9 +3,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 
@@ -13,17 +16,18 @@ public class ClientGUI implements ActionListener {
 
 	public JTextArea chat = null;
 	public JTextField newMessage = null;
-	public JButton sendButton = null;
+	public JButton sendButton = null, sendFilesButton = null;
 	String toAddr;
 	ObjectOutputStream messageOut = null;
 	ObjectInputStream messageIn = null;
+	JFrame frame = null;
 
 	ClientGUI(final String toAddr, ObjectOutputStream messageOut) {
 
 		this.toAddr = toAddr;
 		this.messageOut = messageOut;
 		JFrame.setDefaultLookAndFeelDecorated(true);
-		JFrame frame = new JFrame("[=] " + toAddr + " [=]");
+		frame = new JFrame("[=] " + toAddr + " [=]");
 
 		frame.setContentPane(this.createContentPane());
 
@@ -82,14 +86,26 @@ public class ClientGUI implements ActionListener {
 		bottomPanel.setSize(400, 70);
 		totalGUI.add(bottomPanel, BorderLayout.SOUTH);
 
-		newMessage = new JTextField("", SwingConstants.WEST);
-		bottomPanel.add(newMessage);
+		newMessage = new JTextField("");
+		newMessage.setLocation(0, 300);
+		newMessage.setSize(200, 30);
+		bottomPanel.add(newMessage, BorderLayout.CENTER);
+
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new BorderLayout());
+		bottomPanel.add(buttonPanel, BorderLayout.EAST);
 
 		sendButton = new JButton("Send");
 		sendButton.setLocation(270, 0);
 		sendButton.setSize(30, 30);
 		sendButton.addActionListener(this);
-		bottomPanel.add(sendButton, BorderLayout.EAST);
+		buttonPanel.add(sendButton, BorderLayout.WEST);
+
+		sendFilesButton = new JButton("Send Files");
+		// sendButton.setLocation(270, 0);
+		// sendButton.setSize(30, 30);
+		sendFilesButton.addActionListener(this);
+		buttonPanel.add(sendFilesButton, BorderLayout.EAST);
 
 		totalGUI.setOpaque(true);
 		return totalGUI;
@@ -98,7 +114,6 @@ public class ClientGUI implements ActionListener {
 
 	void send(String input) {
 
-		System.out.println("EFGH");
 		System.out.println("Input = " + input);
 		MessagePacket m = new MessagePacket();
 		m.setFromAddr(MainScreen.myNick);
@@ -128,8 +143,37 @@ public class ClientGUI implements ActionListener {
 				newMessage.setText("");
 
 			}
-		}
+		} else if (e.getSource() == sendFilesButton) {
+			final JFileChooser fc = new JFileChooser();
+			int returnVal = fc.showDialog(this.frame, "Send");
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				File file = fc.getSelectedFile();
+				MessagePacket m = new MessagePacket();
+				m.setToAddr(toAddr);
+				m.setFromAddr(MainScreen.myNick);
+				m.setType(0);
+				m.setMessage(file.getName());
+				try {
+					m.setFileBytes(Files.readAllBytes(file.toPath()));
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				try {
 
+					messageOut.writeObject(m);
+
+				} catch (IOException e1) {
+					System.out.println("Could not write to stream");
+					e1.printStackTrace(System.out);
+					return;
+				}
+			}
+		}
+	}
+
+	public static void main(String[] args) {
+		new ClientGUI(null, null);
 	}
 
 }

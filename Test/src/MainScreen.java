@@ -6,14 +6,18 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
 import java.util.HashMap;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -26,13 +30,11 @@ import javax.swing.border.EtchedBorder;
 public class MainScreen {
 
 	public JTextField newFriend = null;
-	// public static JButton b[] = null;
 	private static HashMap<String, JLabel> status = null;
-	// public static JLabel[] status = null;
 	public JButton addButton = null;
 	public JButton sendButton2 = null;
 	private static Socket socket = null;
-	private static String serverAddress = "172.30.103.79";
+	private static String serverAddress = "172.30.102.178";
 	private static int serverPort = 1237;
 	private static JFrame frame = null;
 	Color C = new Color(59, 89, 182);
@@ -391,23 +393,33 @@ public class MainScreen {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+
 				if (m != null && m.getType() == 0) {
-					ClientGUI temp = openedWindows.get(m.getFromAddr());
-					if (temp != null) {
+					ClientGUI temp;
+					if ((temp = openedWindows.get(m.getFromAddr())) == null) {
+						temp = new ClientGUI(m.getFromAddr(), outStream);
+						openedWindows.put(m.getFromAddr(), temp);
+					}
+					if (m.getFileBytes() == null) {
 						temp.chat.setText(temp.chat.getText() + "\n"
 								+ m.getFromAddr() + " : " + m.getMessage());
 						temp.chat.setCaretPosition(temp.chat.getDocument()
 								.getLength());
-						System.out.println("From Server " + m.getFromAddr()
-								+ " : " + m.getMessage());
 					} else {
-						ClientGUI create = new ClientGUI(m.getFromAddr(),
-								outStream);
-						openedWindows.put(m.getFromAddr(), create);
-						create.chat.setText(create.chat.getText() + "\n"
-								+ m.getFromAddr() + " : " + m.getMessage());
-						create.chat.setCaretPosition(create.chat.getDocument()
-								.getLength());
+						final JFileChooser fc = new JFileChooser();
+						int returnVal = fc.showSaveDialog(temp.frame);
+						File file = null;
+						if (returnVal == JFileChooser.APPROVE_OPTION) {
+							file = fc.getSelectedFile();
+							System.out.println(file.getAbsolutePath());
+							try {
+								Files.write(file.toPath(), m.getFileBytes());
+
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
 					}
 				} else if (m != null && (m.getType() == 1 || m.getType() == 3)) {
 					if (!m.getMessage().equals("does not exist")) {
@@ -415,29 +427,23 @@ public class MainScreen {
 						JLabel temp = status.get(m.getToAddr());
 						if (temp != null) {
 							temp.setText(m.getMessage());
-							if(m.getMessage().equals("online"))
-							{
-								//temp.setBackground(Color.GREEN);
+							if (m.getMessage().equals("online")) {
+								// temp.setBackground(Color.GREEN);
 								temp.getParent().setBackground(Color.GREEN);
-							}
-							else
-							{
-								//temp.setBackground(Color.RED);
+							} else {
+								// temp.setBackground(Color.RED);
 								temp.getParent().setBackground(Color.RED);
 							}
-								
+
 						} else if (m.getType() == 1) {
 							addFriend();
 							JLabel temp2 = status.get(m.getToAddr());
 							temp2.setText(m.getMessage());
-							if(m.getMessage().equals("online"))
-							{
-								//temp2.setBackground(Color.GREEN);
+							if (m.getMessage().equals("online")) {
+								// temp2.setBackground(Color.GREEN);
 								temp2.getParent().setBackground(Color.GREEN);
-							}
-							else
-							{
-								//temp2.setBackground(Color.RED);
+							} else {
+								// temp2.setBackground(Color.RED);
 								temp2.getParent().setBackground(Color.RED);
 							}
 

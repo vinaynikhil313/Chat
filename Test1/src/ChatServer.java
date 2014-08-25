@@ -104,14 +104,13 @@ public class ChatServer implements Runnable {
 				System.out.println("To addr = " + m.getToAddr());
 				ObjectOutputStream OP = connected.get(m.getToAddr());
 				done = m.getMessage().equals(".bye");
-				System.out.println("Message : " + m.getMessage());
-				// m.setFromAddr(temp.getInetAddress().toString().substring(1));
+				if (m.getFileBytes() == null)
+					System.out.println("Message : " + m.getMessage());
 				try {
 					if (OP != null)
 						OP.writeObject(m);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					e.printStackTrace(System.out);
 				}
 			} else if (m != null && m.getType() == 1) {
 
@@ -122,9 +121,7 @@ public class ChatServer implements Runnable {
 					} else {
 						m.setMessage("online");
 					}
-				}
-				else
-				{
+				} else {
 					m.setMessage("does not exist");
 				}
 

@@ -9,7 +9,14 @@ public class MessagePacket implements Serializable{
 	private static final long serialVersionUID = 1L;
 	String toAddr, fromAddr, message;
 	int type;
+	byte[] fileBytes = null;
 	
+	public byte[] getFileBytes() {
+		return fileBytes;
+	}
+	public void setFileBytes(byte[] fileBytes) {
+		this.fileBytes = fileBytes;
+	}
 	public String getToAddr() {
 		return toAddr;
 	}
