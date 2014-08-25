@@ -406,48 +406,66 @@ public class MainScreen {
 						temp.chat.setCaretPosition(temp.chat.getDocument()
 								.getLength());
 					} else {
-						JFileChooser fc = new JFileChooser();
-						int returnVal = fc.showSaveDialog(temp.frame);
-						File file = null;
-						if (returnVal == JFileChooser.APPROVE_OPTION) {
-							file = fc.getSelectedFile();
+						boolean flagged = true;
+						int res = JOptionPane.showConfirmDialog(null,
+								"Do you want to save it?", "Incoming file",
+								JOptionPane.OK_CANCEL_OPTION,
+								JOptionPane.PLAIN_MESSAGE);
+						if (res == JOptionPane.OK_OPTION) {
+							JFileChooser fc = new JFileChooser();
+							int returnVal = fc.showSaveDialog(temp.frame);
+							File file = null;
+							if (returnVal == JFileChooser.APPROVE_OPTION) {
+								file = fc.getSelectedFile();
 
-							boolean flag = true;
-							while (file.exists()) {
-								int result = JOptionPane
-										.showConfirmDialog(
-												null,
-												"File already exists, do you want to overwrite?",
-												"Error",
-												JOptionPane.OK_CANCEL_OPTION,
-												JOptionPane.PLAIN_MESSAGE);
-								// show overwrite option yes or no
-								if (result == JOptionPane.OK_OPTION)
-									break;
-								// if yes {break}
-								else {
-									fc = new JFileChooser();
-									returnVal = fc.showSaveDialog(temp.frame);
-									if (returnVal == JFileChooser.APPROVE_OPTION)
-										file = fc.getSelectedFile();
-									else {
-										flag = false;
+								
+								while (file.exists()) {
+									int result = JOptionPane
+											.showConfirmDialog(
+													null,
+													"File already exists, do you want to overwrite?",
+													"Error",
+													JOptionPane.OK_CANCEL_OPTION,
+													JOptionPane.PLAIN_MESSAGE);
+									// show overwrite option yes or no
+									if (result == JOptionPane.OK_OPTION)
 										break;
+									// if yes {break}
+									else {
+										fc = new JFileChooser();
+										returnVal = fc
+												.showSaveDialog(temp.frame);
+										if (returnVal == JFileChooser.APPROVE_OPTION)
+											file = fc.getSelectedFile();
+										else {
+											flagged = false;
+											break;
+										}
 									}
+									// else{new FileChooser; }
 								}
-								// else{new FileChooser; }
-							}
-							if (flag) {
-								System.out.println(file.getAbsolutePath());
-								try {
-									Files.write(file.toPath(), m.getFileBytes());
+								if (flagged) {
+									System.out.println(file.getAbsolutePath());
+									try {
+										Files.write(file.toPath(),
+												m.getFileBytes());
 
-								} catch (IOException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
+									} catch (IOException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
 								}
 							}
 						}
+						else
+							flagged = false;
+						if(flagged)
+							temp.chat.setText(temp.chat.getText() + "\n"
+									+ m.getFromAddr() + " : " + "File Downloaded");
+						else 
+							temp.chat.setText(temp.chat.getText() + "\n"
+									+ m.getFromAddr() + " : " + "File Rejected");
+							
 					}
 				} else if (m != null && (m.getType() == 1 || m.getType() == 3)) {
 					if (!m.getMessage().equals("does not exist")) {
