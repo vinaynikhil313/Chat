@@ -34,7 +34,7 @@ public class MainScreen {
 	public JButton addButton = null;
 	public JButton sendButton2 = null;
 	private static Socket socket = null;
-	private static String serverAddress = "172.30.102.178";
+	private static String serverAddress = "172.30.103.79";
 	private static int serverPort = 1237;
 	private static JFrame frame = null;
 	Color C = new Color(59, 89, 182);
@@ -156,7 +156,7 @@ public class MainScreen {
 			tempLabel.setLocation(160, 0);
 			tempLabel.setSize(50, 30);
 			tempLabel.setBackground(Color.WHITE);
-			status.put(list[i], tempLabel);
+			status.put(list[i].toLowerCase(), tempLabel);
 
 			temp.add(b);
 			temp.add(tempLabel);
@@ -245,7 +245,7 @@ public class MainScreen {
 		tempLabel.setLocation(160, 0);
 		tempLabel.setSize(50, 30);
 		tempLabel.setBackground(Color.WHITE);
-		status.put(newFriend.getText(), tempLabel);
+		status.put(newFriend.getText().toLowerCase(), tempLabel);
 
 		temp.add(b);
 		temp.add(tempLabel);
@@ -407,8 +407,10 @@ public class MainScreen {
 								.getLength());
 					} else {
 						boolean flagged = true;
+						System.out.println("file: " + m.getMessage());
 						int res = JOptionPane.showConfirmDialog(null,
-								"Do you want to save it?", "Incoming file " +m.getMessage(),
+								"Do you want to save it?",
+								"Incoming file " + m.getMessage(),
 								JOptionPane.OK_CANCEL_OPTION,
 								JOptionPane.PLAIN_MESSAGE);
 						if (res == JOptionPane.OK_OPTION) {
@@ -418,7 +420,7 @@ public class MainScreen {
 							File file = null;
 							if (returnVal == JFileChooser.APPROVE_OPTION) {
 								file = fc.getSelectedFile();
-								
+
 								while (file.exists()) {
 									int result = JOptionPane
 											.showConfirmDialog(
@@ -433,7 +435,8 @@ public class MainScreen {
 									// if yes {break}
 									else {
 										fc = new JFileChooser();
-										fc.setSelectedFile( new File(m.getMessage()));
+										fc.setSelectedFile(new File(m
+												.getMessage()));
 										returnVal = fc
 												.showSaveDialog(temp.frame);
 										if (returnVal == JFileChooser.APPROVE_OPTION)
@@ -456,22 +459,22 @@ public class MainScreen {
 										e.printStackTrace();
 									}
 								}
-							}
-						}
-						else
+							} else
+								flagged = false;
+						} else
 							flagged = false;
-						if(flagged)
+						if (flagged)
 							temp.chat.setText(temp.chat.getText() + "\n"
-									+ m.getFromAddr() + " : " + "File Downloaded");
-						else 
+									+ "\tFile Downloaded");
+						else
 							temp.chat.setText(temp.chat.getText() + "\n"
-									+ m.getFromAddr() + " : " + "File Rejected");
-							
+									+ "\tFile Rejected");
+
 					}
 				} else if (m != null && (m.getType() == 1 || m.getType() == 3)) {
 					if (!m.getMessage().equals("does not exist")) {
 
-						JLabel temp = status.get(m.getToAddr());
+						JLabel temp = status.get(m.getToAddr().toLowerCase());
 						if (temp != null) {
 							temp.setText(m.getMessage());
 							if (m.getMessage().equals("online")) {
@@ -484,7 +487,7 @@ public class MainScreen {
 
 						} else if (m.getType() == 1) {
 							addFriend();
-							JLabel temp2 = status.get(m.getToAddr());
+							JLabel temp2 = status.get(m.getToAddr().toLowerCase());
 							temp2.setText(m.getMessage());
 							if (m.getMessage().equals("online")) {
 								// temp2.setBackground(Color.GREEN);

@@ -45,8 +45,8 @@ public class ChatServer implements Runnable {
 						+ socket.getInetAddress().toString().substring(1)
 						+ " nick " + temp);
 				if (temp != null)
-					connected.put(temp,
-							new ObjectOutputStream(socket.getOutputStream()));
+					connected.put(temp.toLowerCase(), new ObjectOutputStream(
+							socket.getOutputStream()));
 				else
 					connected.put(
 							socket.getInetAddress().toString().substring(1),
@@ -102,10 +102,15 @@ public class ChatServer implements Runnable {
 
 			if (m != null && m.getType() == 0) {
 				System.out.println("To addr = " + m.getToAddr());
-				ObjectOutputStream OP = connected.get(m.getToAddr());
-				done = m.getMessage().equals(".bye");
+				ObjectOutputStream OP = connected.get(m.getToAddr()
+						.toLowerCase());
+				// done = m.getMessage().equals(".bye");
 				if (m.getFileBytes() == null)
 					System.out.println("Message : " + m.getMessage());
+				else {
+					System.out.println("Message file name : " + m.getMessage());
+					// System.out.println("Message : " + m.getMessage());
+				}
 				try {
 					if (OP != null)
 						OP.writeObject(m);
@@ -116,7 +121,7 @@ public class ChatServer implements Runnable {
 
 				boolean isPresent = db.checkUser(1, m.getToAddr());
 				if (isPresent) {
-					if (connected.get(m.getToAddr()) == null) {
+					if (connected.get(m.getToAddr().toLowerCase()) == null) {
 						m.setMessage("offline");
 					} else {
 						m.setMessage("online");
@@ -125,7 +130,8 @@ public class ChatServer implements Runnable {
 					m.setMessage("does not exist");
 				}
 
-				ObjectOutputStream OP = connected.get(m.getFromAddr());
+				ObjectOutputStream OP = connected.get(m.getFromAddr()
+						.toLowerCase());
 				try {
 					OP.writeObject(m);
 					System.out.println("sent");
@@ -143,7 +149,7 @@ public class ChatServer implements Runnable {
 					ObjectOutputStream OP = null;
 					if (tempNick != null) {
 						m.setMessage(tempNick);
-						OP = connected.get(tempNick);
+						OP = connected.get(tempNick.toLowerCase());
 					} else {
 						m.setMessage("not registered");
 						OP = connected.get(temp.getInetAddress().toString()
@@ -176,7 +182,7 @@ public class ChatServer implements Runnable {
 						}
 						connected.remove(temp.getInetAddress().toString()
 								.substring(1));
-						connected.put(m.getMessage(), OP);
+						connected.put(m.getMessage().toLowerCase(), OP);
 
 					} else {
 						m.setMessage("nick already exists");
@@ -193,7 +199,7 @@ public class ChatServer implements Runnable {
 				}
 
 			} else if (m != null && m.getType() == 3) {
-				connected.remove(m.getFromAddr());
+				connected.remove(m.getFromAddr().toLowerCase());
 				System.out.println("client disconnected");
 				for (String key : connected.keySet()) {
 					ObjectOutputStream OP = connected.get(key);
@@ -212,17 +218,6 @@ public class ChatServer implements Runnable {
 			}
 
 		}
-		// System.out.println(connected.get(temp.getInetAddress().toString().substring(1)));
-		// connected.remove(temp.getInetAddress().toString().substring(1));
-		// System.out.println("client disconnected");
-		/*
-		 * for (String key : connected.keySet()) { ObjectOutputStream OP =
-		 * connected.get(key); MessagePacket m = new MessagePacket();
-		 * m.setToAddr(temp.getInetAddress().toString().substring(1));
-		 * m.setType(1); m.setMessage("offline"); try { OP.writeObject(m); }
-		 * catch (IOException e) { // TODO Auto-generated catch block
-		 * e.printStackTrace(); } }
-		 */
 		try {
 			temp.close();
 		} catch (IOException e) {
