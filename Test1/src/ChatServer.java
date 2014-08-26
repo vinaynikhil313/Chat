@@ -148,7 +148,7 @@ public class ChatServer implements Runnable {
 					System.out.println(tempNick);
 					ObjectOutputStream OP = null;
 					if (tempNick != null) {
-						m.setMessage(tempNick);
+						m.setMessage(tempNick.toLowerCase());
 						OP = connected.get(tempNick.toLowerCase());
 					} else {
 						m.setMessage("not registered");
