@@ -339,7 +339,7 @@ public class MainScreen {
 
 			JButton tempButton = (JButton) e.getComponent();
 			tempButton.setForeground(Color.BLACK);
-			String toAddr = tempButton.getText();
+			String toAddr = tempButton.getText().toLowerCase();
 			if (openedWindows.get(toAddr) == null) {
 				ClientGUI temp = new ClientGUI(toAddr, outStream);
 				openedWindows.put(toAddr, temp);
